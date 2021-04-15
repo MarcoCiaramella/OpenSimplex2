@@ -10,6 +10,23 @@
 
 
 
+unsigned char *to_rgb_arr(int width, int height, float **vals){
+    int size = width * height * 4;
+    unsigned char *pixels = (unsigned char *) malloc(size);
+    for (int x = 0; x < width; x++){
+        for (int y = 0; y < height; y++){
+            float val = vals[x][y];
+            val = (val + 1.0) / 2.0;
+            unsigned char gray = (unsigned char) (val * 255);
+            int p = (y * width + x) * 4;
+            pixels[p + 0] = gray; //blue
+            pixels[p + 1] = gray;//green
+            pixels[p + 2] = gray;//red
+        }
+    }
+    return pixels;
+}
+
 void save_bitmap(char *filename, int width, int height, float **vals){
     int size = width * height * 4; //for 32-bit bitmap only
 
@@ -24,31 +41,18 @@ void save_bitmap(char *filename, int width, int height, float **vals){
     memset(&header[28], (short)32, 1);//32bit
     memset(&header[34], (int)size, 1);//pixel size
 
-    unsigned char *pixels = (unsigned char *) malloc(size);
-    for(int row = height - 1; row >= 0; row--) {
-        for(int column = 0; column < width; column++) {
-            float val = vals[column][row];
-            val = (val + 1.0) / 2.0;
-            unsigned char gray = (unsigned char) (val * 255);
-            int p = (row * width + column) * 4;
-            pixels[p + 0] = gray; //blue
-            pixels[p + 1] = gray;//green
-            pixels[p + 2] = gray;//red
-        }
-    }
-
     FILE *fout = fopen(filename, "wb");
     fwrite(header, 1, 54, fout);
-    fwrite(pixels, 1, size, fout);
+    fwrite(to_rgb_arr(width, height, vals), 1, size, fout);
     free(pixels);
     fclose(fout);
 }
 
-void save_png(char *filename){
+void save_png(char *filename, int width, int height, float **vals){
     int width, height;
     png_byte color_type;
     png_byte bit_depth;
-    png_bytep *row_pointers = NULL;
+    png_bytep *row_pointers = to_rgb_arr(width, height, vals);
     int y;
 
     FILE *fp = fopen(filename, "wb");
@@ -111,6 +115,7 @@ int main(){
         }
     }
     save_bitmap("noise2.bmp", WIDTH, HEIGHT, noise);
+    save_png("noise2.png", WIDTH, HEIGHT, noise);
 
     for (int x = 0; x < 10; x++){
         for (int y = 0; y < 10; y++){
