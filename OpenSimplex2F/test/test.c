@@ -53,7 +53,8 @@ void save_bitmap(char *filename, int width, int height, float **vals){
 void save_png(char *filename, int width, int height, float **vals){
     png_byte color_type;
     png_byte bit_depth;
-    png_bytep *row_pointers = to_rgb_arr(width, height, vals);
+    png_bytep pixels = to_rgb_arr(width, height, vals);
+    png_bytep *row_pointers = &pixels;
     int y;
 
     FILE *fp = fopen(filename, "wb");
