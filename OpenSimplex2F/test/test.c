@@ -41,9 +41,11 @@ void save_bitmap(char *filename, int width, int height, float **vals){
     memset(&header[28], (short)32, 1);//32bit
     memset(&header[34], (int)size, 1);//pixel size
 
+    unsigned char *pixels = to_rgb_arr(width, height, vals);
+
     FILE *fout = fopen(filename, "wb");
     fwrite(header, 1, 54, fout);
-    fwrite(to_rgb_arr(width, height, vals), 1, size, fout);
+    fwrite(pixels, 1, size, fout);
     free(pixels);
     fclose(fout);
 }
