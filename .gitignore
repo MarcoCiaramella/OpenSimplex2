@@ -1,6 +1,6 @@
-OpenSimplex2*/*.obj
 *.obj
 *.exe
 *.pdb
 *.ilk
 .vscode
+*.bmp
