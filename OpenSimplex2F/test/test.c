@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../OpenSimplex2F.h"
-#include <png.h>
 
 
 
@@ -50,62 +49,6 @@ void save_bitmap(char *filename, int width, int height, float **vals){
     fclose(fout);
 }
 
-void save_png(char *filename, int width, int height, float **vals){
-    png_byte color_type;
-    png_byte bit_depth;
-    png_bytep pixels = to_rgb_arr(width, height, vals);
-    png_bytep *row_pointers = &pixels;
-    int y;
-
-    FILE *fp = fopen(filename, "wb");
-    if (!fp)
-        abort();
-
-    png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!png)
-        abort();
-
-    png_infop info = png_create_info_struct(png);
-    if (!info)
-        abort();
-
-    if (setjmp(png_jmpbuf(png)))
-        abort();
-
-    png_init_io(png, fp);
-
-    // Output is 8bit depth, RGBA format.
-    png_set_IHDR(
-        png,
-        info,
-        width, height,
-        8,
-        PNG_COLOR_TYPE_RGBA,
-        PNG_INTERLACE_NONE,
-        PNG_COMPRESSION_TYPE_DEFAULT,
-        PNG_FILTER_TYPE_DEFAULT);
-    png_write_info(png, info);
-
-    // To remove the alpha channel for PNG_COLOR_TYPE_RGB format,
-    // Use png_set_filler().
-    //png_set_filler(png, 0, PNG_FILLER_AFTER);
-
-    if (!row_pointers)
-        abort();
-
-    png_write_image(png, row_pointers);
-    png_write_end(png, NULL);
-
-    for (int y = 0; y < height; y++){
-        free(row_pointers[y]);
-    }
-    free(row_pointers);
-
-    fclose(fp);
-
-    png_destroy_write_struct(&png, &info);
-}
-
 int main(){
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
@@ -117,7 +60,6 @@ int main(){
         }
     }
     save_bitmap("noise2.bmp", WIDTH, HEIGHT, noise);
-    save_png("noise2.png", WIDTH, HEIGHT, noise);
 
     for (int x = 0; x < 10; x++){
         for (int y = 0; y < 10; y++){
