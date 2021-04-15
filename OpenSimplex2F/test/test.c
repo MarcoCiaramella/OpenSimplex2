@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include "../OpenSimplex2F.h"
 #include <png.h>
@@ -29,7 +30,6 @@ void save_bitmap(char *filename, int width, int height, float **vals){
             float val = vals[column][row];
             val = (val + 1.0) / 2.0;
             unsigned char gray = (unsigned char) (val * 255);
-            printf("gray %d\n", gray);
             int p = (row * width + column) * 4;
             pixels[p + 0] = gray; //blue
             pixels[p + 1] = gray;//green
