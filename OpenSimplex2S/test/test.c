@@ -8,6 +8,23 @@
 
 
 
+unsigned char *to_rgb_arr(int width, int height, float **vals){
+    int size = width * height * 4;
+    unsigned char *pixels = (unsigned char *) malloc(size);
+    for (int x = 0; x < width; x++){
+        for (int y = 0; y < height; y++){
+            float val = vals[x][y];
+            val = (val + 1.0) / 2.0;
+            unsigned char gray = (unsigned char) (val * 255);
+            int p = (y * width + x) * 4;
+            pixels[p + 0] = gray; //blue
+            pixels[p + 1] = gray;//green
+            pixels[p + 2] = gray;//red
+        }
+    }
+    return pixels;
+}
+
 void save_bitmap(char *filename, int width, int height, float **vals){
     int size = width * height * 4; //for 32-bit bitmap only
 
@@ -22,18 +39,7 @@ void save_bitmap(char *filename, int width, int height, float **vals){
     memset(&header[28], (short)32, 1);//32bit
     memset(&header[34], (int)size, 1);//pixel size
 
-    unsigned char *pixels = (unsigned char *) malloc(size);
-    for(int row = height - 1; row >= 0; row--) {
-        for(int column = 0; column < width; column++) {
-            float val = vals[column][row];
-            val = (val + 1.0) / 2.0;
-            unsigned char gray = (unsigned char) (val * 255);
-            int p = (row * width + column) * 4;
-            pixels[p + 0] = gray; //blue
-            pixels[p + 1] = gray;//green
-            pixels[p + 2] = gray;//red
-        }
-    }
+    unsigned char *pixels = to_rgb_arr(width, height, vals);
 
     FILE *fout = fopen(filename, "wb");
     fwrite(header, 1, 54, fout);
