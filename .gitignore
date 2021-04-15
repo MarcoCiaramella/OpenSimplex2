@@ -1,0 +1,6 @@
+OpenSimplex2F/*.obj
+*.obj
+*.exe
+*.pdb
+*.ilk
+.vscode
