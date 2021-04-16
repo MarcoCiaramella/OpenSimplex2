@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include <assert.h>
 #include "OpenSimplex2F.h"
 
 
@@ -22,6 +23,12 @@
 int _fastFloor(double x){
 	int xi = (int)x;
 	return x < xi ? xi - 1 : xi;
+}
+
+void _test_fastFloor(){
+	assert(_fastFloor(1.2) == 1);
+	assert(_fastFloor(0.4) == 0);
+	assert(_fastFloor(-2.7) == -3);
 }
 
 Grad2 *_newGrad2Arr(unsigned int size){
@@ -47,12 +54,25 @@ Grad2 _newGrad2(double dx, double dy){
     return grad2;
 }
 
+void _test_newGrad2(){
+	Grad2 g = _newGrad2(1.3, -4.9);
+	assert(g.dx == 1.3);
+	assert(g.dy == -4.9);
+}
+
 Grad3 _newGrad3(double dx, double dy, double dz){
     Grad3 grad3;
     grad3.dx = dx;
     grad3.dy = dy;
     grad3.dz = dz;
     return grad3;
+}
+
+void _test_newGrad3(){
+	Grad3 g = _newGrad3(-3.87, 0.2, 1.3);
+	assert(g.dx == -3.87);
+	assert(g.dy == 0.2);
+	assert(g.dz == 1.3);
 }
 
 Grad4 _newGrad4(double dx, double dy, double dz, double dw){
@@ -62,6 +82,14 @@ Grad4 _newGrad4(double dx, double dy, double dz, double dw){
     grad4.dz = dz;
     grad4.dw = dw;
     return grad4;
+}
+
+void _test_newGrad4(){
+	Grad4 g = _newGrad4(1,2,3,4);
+	assert(g.dx == 1);
+	assert(g.dy == 2);
+	assert(g.dz == 3);
+	assert(g.dw == 4);
 }
 
 Grad2 *_newGrad2ConstArray(){
@@ -100,6 +128,14 @@ Grad2 *_newGrad2ConstArray(){
         gradients2D[i] = arr[i % 24];
     }
     return gradients2D;
+}
+
+void _test_newGrad2ConstArray(){
+	Grad2 *g = _newGrad2ConstArray();
+	for (int i = 0; i < PSIZE; i++){
+		assert(g[i].dx >= -1 && g[i].dx <= 1 && g[i].dx != 0);
+		assert(g[i].dy >= -1 && g[i].dy <= 1 && g[i].dy != 0);
+	}
 }
 
 Grad3 *_newGrad3ConstArray(){
@@ -858,4 +894,12 @@ OpenSimplexGradients *newOpenSimplexGradients(OpenSimplexEnv *ose, long seed){
 		source[r] = source[i];
     }
 	return osg;
+}
+
+void test(){
+	_test_fastFloor();
+	_test_newGrad2();
+	_test_newGrad3();
+	_test_newGrad4();
+	_test_newGrad2ConstArray();
 }
