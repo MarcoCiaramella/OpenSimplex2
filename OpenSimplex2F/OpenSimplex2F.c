@@ -133,8 +133,10 @@ Grad2 *_newGrad2ConstArray(){
 void _test_newGrad2ConstArray(){
 	Grad2 *g = _newGrad2ConstArray();
 	for (int i = 0; i < PSIZE; i++){
-		assert(g[i].dx >= -1 && g[i].dx <= 1 && g[i].dx != 0);
-		assert(g[i].dy >= -1 && g[i].dy <= 1 && g[i].dy != 0);
+		assert(g[i].dx >= -1 && g[i].dx <= 1);
+		assert(g[i].dx != 0);
+		assert(g[i].dy >= -1 && g[i].dy <= 1);
+		assert(g[i].dy != 0);
 	}
 }
 
