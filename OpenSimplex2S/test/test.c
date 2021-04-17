@@ -8,9 +8,9 @@
 int main(){
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
-    float **noise = (float **) malloc(sizeof(float *) * HEIGHT);
+    double **noise = (double **) malloc(sizeof(double *) * HEIGHT);
     for (int y = 0; y < HEIGHT; y++){
-        noise[y] = (float *) malloc(sizeof(float) * WIDTH);
+        noise[y] = (double *) malloc(sizeof(double) * WIDTH);
         for (int x = 0; x < WIDTH; x++){
             noise[y][x] = noise2(ose, osg, x, y);
         }

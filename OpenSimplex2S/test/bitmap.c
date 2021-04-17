@@ -88,13 +88,13 @@ void generateBitmapImage(unsigned char* image, int height, int width, char* imag
     fclose(imageFile);
 }
 
-void save_bitmap(char *filename, float **vals){
+void save_bitmap(char *filename, double **vals){
     unsigned char image[HEIGHT][WIDTH][BYTES_PER_PIXEL];
 
     int i, j;
     for (i = 0; i < HEIGHT; i++) {
         for (j = 0; j < WIDTH; j++) {
-            float val = vals[i][j];
+            double val = vals[i][j];
             val = (val + 1.0) / 2.0;
             unsigned char gray = (unsigned char) (val * 255);
             image[i][j][2] = gray; // red

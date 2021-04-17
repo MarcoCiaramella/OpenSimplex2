@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <string.h>
 #include "OpenSimplex2F.h"
 
 
@@ -128,16 +129,6 @@ Grad2 *_newGrad2ConstArray(){
         gradients2D[i] = arr[i % 24];
     }
     return gradients2D;
-}
-
-void _test_newGrad2ConstArray(){
-	Grad2 *g = _newGrad2ConstArray();
-	for (int i = 0; i < PSIZE; i++){
-		assert(g[i].dx >= -1 && g[i].dx <= 1);
-		assert(g[i].dx != 0);
-		assert(g[i].dy >= -1 && g[i].dy <= 1);
-		assert(g[i].dy != 0);
-	}
 }
 
 Grad3 *_newGrad3ConstArray(){
@@ -426,6 +417,14 @@ LatticePoint2D **_newLatticePoint2DConstArray(){
 	plp2DArr[2] = _newLatticePoint2D(1, 1);
 	plp2DArr[3] = _newLatticePoint2D(0, 1);
 	return plp2DArr;
+}
+
+void _test_newLatticePoint2DConstArray(){
+	LatticePoint2D **arr = _newLatticePoint2DConstArray();
+	assert(memcmp(arr[0], _newLatticePoint2D(1, 0), sizeof(LatticePoint2D)) == 0);
+	assert(memcmp(arr[1], _newLatticePoint2D(0, 0), sizeof(LatticePoint2D)) == 0);
+	assert(memcmp(arr[2], _newLatticePoint2D(1, 1), sizeof(LatticePoint2D)) == 0);
+	assert(memcmp(arr[3], _newLatticePoint2D(0, 1), sizeof(LatticePoint2D)) == 0);
 }
 
 LatticePoint3D **_newLatticePoint3DConstArray(){
@@ -903,5 +902,5 @@ void test(){
 	_test_newGrad2();
 	_test_newGrad3();
 	_test_newGrad4();
-	_test_newGrad2ConstArray();
+	_test_newLatticePoint2DConstArray();
 }
