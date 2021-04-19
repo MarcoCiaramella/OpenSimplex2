@@ -1,4 +1,1 @@
-#define WIDTH 512
-#define HEIGHT 512
-
-void save_bitmap(char *filename, double **vals);
+void save_bitmap(char *filename, int width, int height, double **vals);

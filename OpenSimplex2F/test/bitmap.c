@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "bitmap.h"
 
 
 
@@ -12,7 +11,7 @@
 
 
 
-unsigned char* createBitmapInfoHeader (int height, int width){
+unsigned char *createBitmapInfoHeader(int height, int width){
     static unsigned char infoHeader[] = {
         0,0,0,0, /// header size
         0,0,0,0, /// image width
@@ -42,7 +41,7 @@ unsigned char* createBitmapInfoHeader (int height, int width){
     return infoHeader;
 }
 
-unsigned char* createBitmapFileHeader (int height, int stride){
+unsigned char *createBitmapFileHeader(int height, int stride){
     int fileSize = FILE_HEADER_SIZE + INFO_HEADER_SIZE + (stride * height);
 
     static unsigned char fileHeader[] = {
@@ -63,7 +62,7 @@ unsigned char* createBitmapFileHeader (int height, int stride){
     return fileHeader;
 }
 
-void generateBitmapImage(unsigned char* image, int height, int width, char* imageFileName){
+void generateBitmapImage(unsigned char *image, int height, int width, char *imageFileName){
     int widthInBytes = width * BYTES_PER_PIXEL;
 
     unsigned char padding[3] = {0, 0, 0};
@@ -88,20 +87,20 @@ void generateBitmapImage(unsigned char* image, int height, int width, char* imag
     fclose(imageFile);
 }
 
-void save_bitmap(char *filename, double **vals){
-    unsigned char image[HEIGHT][WIDTH][BYTES_PER_PIXEL];
-
-    int i, j;
-    for (i = 0; i < HEIGHT; i++) {
-        for (j = 0; j < WIDTH; j++) {
+void save_bitmap(char *filename, int width, int height, double **vals){
+    unsigned char *image = (unsigned char *) malloc(sizeof(unsigned char) * height * width * BYTES_PER_PIXEL);
+    int index = 0;
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
             double val = vals[i][j];
             val = (val + 1.0) / 2.0;
             unsigned char gray = (unsigned char) (val * 255);
-            image[i][j][2] = gray; // red
-            image[i][j][1] = gray; // green
-            image[i][j][0] = gray; // blue
+            image[index++] = gray;
+            image[index++] = gray;
+            image[index++] = gray;
         }
     }
 
-    generateBitmapImage((unsigned char*) image, HEIGHT, WIDTH, filename);
+    generateBitmapImage(image, height, width, filename);
+    free(image);
 }
