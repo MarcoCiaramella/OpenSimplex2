@@ -121,7 +121,6 @@ void save_bitmap(char *filename, int width, int height, double **vals){
 
 
 int main(){
-    test();
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
     double **noise = (double **) malloc(sizeof(double *) * HEIGHT);
