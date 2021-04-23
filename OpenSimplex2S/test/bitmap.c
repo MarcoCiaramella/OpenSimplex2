@@ -105,6 +105,7 @@ char *save_bitmap(char *filename, int width, int height, double **vals){
     generateBitmapImage(image, height, width, f);
     fclose(f);
     free(image);
+    free(vals);
     return filename;
 }
 
