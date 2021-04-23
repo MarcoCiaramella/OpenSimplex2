@@ -62,15 +62,13 @@ unsigned char *createBitmapFileHeader(int height, int stride){
     return fileHeader;
 }
 
-void generateBitmapImage(unsigned char *image, int height, int width, char *imageFileName){
+void generateBitmapImage(unsigned char *image, int height, int width, FILE *imageFile){
     int widthInBytes = width * BYTES_PER_PIXEL;
 
     unsigned char padding[3] = {0, 0, 0};
     int paddingSize = (4 - (widthInBytes) % 4) % 4;
 
     int stride = (widthInBytes) + paddingSize;
-
-    FILE* imageFile = fopen(imageFileName, "wb");
 
     unsigned char* fileHeader = createBitmapFileHeader(height, stride);
     fwrite(fileHeader, 1, FILE_HEADER_SIZE, imageFile);
@@ -83,11 +81,9 @@ void generateBitmapImage(unsigned char *image, int height, int width, char *imag
         fwrite(image + (i*widthInBytes), BYTES_PER_PIXEL, width, imageFile);
         fwrite(padding, 1, paddingSize, imageFile);
     }
-
-    fclose(imageFile);
 }
 
-void save_bitmap(char *filename, int width, int height, double **vals){
+unsigned char *create_bitmap(int width, int height, double **vals){
     unsigned char *image = (unsigned char *) malloc(sizeof(unsigned char) * height * width * BYTES_PER_PIXEL);
     int index = 0;
     for (int i = 0; i < height; i++) {
@@ -100,7 +96,52 @@ void save_bitmap(char *filename, int width, int height, double **vals){
             image[index++] = gray;
         }
     }
+    return image;
+}
 
-    generateBitmapImage(image, height, width, filename);
+char *save_bitmap(char *filename, int width, int height, double **vals){
+    unsigned char *image = create_bitmap(width, height, vals);
+    FILE *f = fopen(filename, "wb");
+    generateBitmapImage(image, height, width, f);
+    fclose(f);
     free(image);
+    return filename;
+}
+
+unsigned char *load_bitmap(char *filename, long *num_bytes){
+    FILE *f = fopen(filename,"rb");
+    unsigned char info[54];
+
+    // read the 54-byte header
+    fread(info, sizeof(unsigned char), 54, f); 
+
+    // extract image height and width from header
+    int width = *(int*)&info[18];
+    int height = *(int*)&info[22];
+
+    // allocate 3 bytes per pixel
+    int size = BYTES_PER_PIXEL * width * height;
+    unsigned char *data = (unsigned char *) malloc(sizeof(unsigned char) * size);
+
+    // read the rest of the data at once
+    fread(data, sizeof(unsigned char), size, f); 
+    fclose(f);
+
+    for (int i = 0; i < size; i += BYTES_PER_PIXEL){
+        // flip the order of every 3 bytes
+        unsigned char tmp = data[i];
+        data[i] = data[i+2];
+        data[i+2] = tmp;
+    }
+
+    *num_bytes = sizeof(unsigned char) * size;
+
+    return data;
+}
+
+int bitmap_compare(char *filename1, char *filename2){
+    long num_bytes;
+    unsigned char *data1 = load_bitmap(filename1, &num_bytes);
+    unsigned char *data2 = load_bitmap(filename2, &num_bytes);
+    return memcmp(data1, data2, num_bytes) == 0;
 }

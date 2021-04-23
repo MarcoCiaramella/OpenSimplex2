@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
-#include <assert.h>
 #include <string.h>
 #include "OpenSimplex2F.h"
 
@@ -24,12 +23,6 @@
 int _fastFloor(double x){
 	int xi = (int)x;
 	return x < xi ? xi - 1 : xi;
-}
-
-void _test_fastFloor(){
-	assert(_fastFloor(1.2) == 1);
-	assert(_fastFloor(0.4) == 0);
-	assert(_fastFloor(-2.7) == -3);
 }
 
 Grad2 *_newGrad2Arr(unsigned int size){
@@ -55,25 +48,12 @@ Grad2 _newGrad2(double dx, double dy){
     return grad2;
 }
 
-void _test_newGrad2(){
-	Grad2 g = _newGrad2(1.3, -4.9);
-	assert(g.dx == 1.3);
-	assert(g.dy == -4.9);
-}
-
 Grad3 _newGrad3(double dx, double dy, double dz){
     Grad3 grad3;
     grad3.dx = dx;
     grad3.dy = dy;
     grad3.dz = dz;
     return grad3;
-}
-
-void _test_newGrad3(){
-	Grad3 g = _newGrad3(-3.87, 0.2, 1.3);
-	assert(g.dx == -3.87);
-	assert(g.dy == 0.2);
-	assert(g.dz == 1.3);
 }
 
 Grad4 _newGrad4(double dx, double dy, double dz, double dw){
@@ -83,14 +63,6 @@ Grad4 _newGrad4(double dx, double dy, double dz, double dw){
     grad4.dz = dz;
     grad4.dw = dw;
     return grad4;
-}
-
-void _test_newGrad4(){
-	Grad4 g = _newGrad4(1,2,3,4);
-	assert(g.dx == 1);
-	assert(g.dy == 2);
-	assert(g.dz == 3);
-	assert(g.dw == 4);
 }
 
 Grad2 *_newGrad2ConstArray(){
@@ -417,14 +389,6 @@ LatticePoint2D **_newLatticePoint2DConstArray(){
 	plp2DArr[2] = _newLatticePoint2D(1, 1);
 	plp2DArr[3] = _newLatticePoint2D(0, 1);
 	return plp2DArr;
-}
-
-void _test_newLatticePoint2DConstArray(){
-	LatticePoint2D **arr = _newLatticePoint2DConstArray();
-	assert(memcmp(arr[0], _newLatticePoint2D(1, 0), sizeof(LatticePoint2D)) == 0);
-	assert(memcmp(arr[1], _newLatticePoint2D(0, 0), sizeof(LatticePoint2D)) == 0);
-	assert(memcmp(arr[2], _newLatticePoint2D(1, 1), sizeof(LatticePoint2D)) == 0);
-	assert(memcmp(arr[3], _newLatticePoint2D(0, 1), sizeof(LatticePoint2D)) == 0);
 }
 
 LatticePoint3D **_newLatticePoint3DConstArray(){
@@ -895,12 +859,4 @@ OpenSimplexGradients *newOpenSimplexGradients(OpenSimplexEnv *ose, long seed){
 		source[r] = source[i];
     }
 	return osg;
-}
-
-void test(){
-	_test_fastFloor();
-	_test_newGrad2();
-	_test_newGrad3();
-	_test_newGrad4();
-	_test_newLatticePoint2DConstArray();
 }

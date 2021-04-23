@@ -58,4 +58,3 @@ double noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, 
 double noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w);
 double noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w);
 double noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w);
-void test();
