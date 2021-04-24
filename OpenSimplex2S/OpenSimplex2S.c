@@ -1753,7 +1753,6 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 	// Point contributions
 	LatticePoint4D *c = (LatticePoint4D *)ose->LOOKUP_4D[index].data;
 	for (int i = 0; i < ose->LOOKUP_4D[index].length; i++){
-		c++;
 		double dx = xi + c->dx, dy = yi + c->dy, dz = zi + c->dz, dw = wi + c->dw;
 		double attn = 0.8 - dx * dx - dy * dy - dz * dz - dw * dw;
 		if (attn > 0){
@@ -1766,6 +1765,7 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 
 			value += attn * attn * extrapolation;
 		}
+		c++;
 	}
 	return value;
 }
