@@ -126,7 +126,6 @@ int main(){
      cl_device_id gpu_device;
      get_GPU_platform(&gpu_platform);
      get_GPU_device(gpu_platform, &gpu_device);
-     //run_kernel(gpu_device, "OpenSimplex2F.cl", 10, 10);
-     run_kernel(gpu_device, "noise.cl", 10, 10);
+     run_kernel(gpu_device, "OpenSimplex2F.cl", 10, 10);
      return 0;
 }
