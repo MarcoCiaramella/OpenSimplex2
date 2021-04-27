@@ -78,6 +78,16 @@ char* read_file(char* filename){
      return buffer;
 }
 
+void print_build_log_failure(cl_int res, cl_device_id gpu_device, cl_program program){
+     if (res == CL_BUILD_PROGRAM_FAILURE){
+          size_t log_size;
+          clGetProgramBuildInfo(program, gpu_device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+          char *log = (char *)malloc(log_size);
+          clGetProgramBuildInfo(program, gpu_device, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);
+          printf("%s\n", log);
+     }
+}
+
 void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int height){
      cl_context context;
      cl_command_queue queue;
@@ -96,7 +106,8 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      context = clCreateContext(0, 1, &gpu_device, NULL, NULL, &errcode_ret);
      queue = clCreateCommandQueue(context, gpu_device, 0, &errcode_ret);
      program = clCreateProgramWithSource(context, 1, &kernel_source, NULL, &errcode_ret);
-     clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+     cl_int res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+     print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "main", &errcode_ret);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, buffer_size_in_bytes, NULL, NULL);
 
