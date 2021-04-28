@@ -18,11 +18,16 @@ typedef struct {
     double dx, dy;
 } LatticePoint2D;
 
-typedef struct _LatticePoint3D {
+typedef struct {
     double dxr, dyr, dzr;
     int xrv, yrv, zrv;
-    struct _LatticePoint3D nextOnFailure;
-    struct _LatticePoint3D nextOnSuccess;
+	bool is_null;
+} _LatticePoint3D;
+
+typedef struct _LatticePoint3D {
+    _LatticePoint3D _this;
+    _LatticePoint3D nextOnFailure;
+    _LatticePoint3D nextOnSuccess;
 } LatticePoint3D;
 
 typedef struct {
@@ -378,12 +383,15 @@ LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
 
 LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
 	LatticePoint3D lp3D;
-	lp3D.dxr = -xrv + lattice * 0.5;
-	lp3D.dyr = -yrv + lattice * 0.5;
-	lp3D.dzr = -zrv + lattice * 0.5;
-	lp3D.xrv = xrv + lattice * 1024;
-	lp3D.yrv = yrv + lattice * 1024;
-	lp3D.zrv = zrv + lattice * 1024;
+	lp3D._this.dxr = -xrv + lattice * 0.5;
+	lp3D._this.dyr = -yrv + lattice * 0.5;
+	lp3D._this.dzr = -zrv + lattice * 0.5;
+	lp3D._this.xrv = xrv + lattice * 1024;
+	lp3D._this.yrv = yrv + lattice * 1024;
+	lp3D._this.zrv = zrv + lattice * 1024;
+	lp3D._this.is_null = false;
+	lp3D.nextOnFailure.is_null = false;
+	lp3D.nextOnSuccess.is_null = false;
 	return lp3D;
 }
 
@@ -438,23 +446,23 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 		LatticePoint3D c7 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
 
 		// First two are guaranteed.
-		c0.nextOnFailure = c0.nextOnSuccess = c1;
-		c1.nextOnFailure = c1.nextOnSuccess = c2;
+		c0.nextOnFailure = c0.nextOnSuccess = c1._this;
+		c1.nextOnFailure = c1.nextOnSuccess = c2._this;
 
 		// Once we find one on the first half-lattice, the rest are out.
 		// In addition, knowing c2 rules out c5.
-		c2.nextOnFailure = c3;
-		c2.nextOnSuccess = c6;
-		c3.nextOnFailure = c4;
-		c3.nextOnSuccess = c5;
-		c4.nextOnFailure = c4.nextOnSuccess = c5;
+		c2.nextOnFailure = c3._this;
+		c2.nextOnSuccess = c6._this;
+		c3.nextOnFailure = c4._this;
+		c3.nextOnSuccess = c5._this;
+		c4.nextOnFailure = c4.nextOnSuccess = c5._this;
 
 		// Once we find one on the second half-lattice, the rest are out.
-		c5.nextOnFailure = c6;
-		c5.nextOnSuccess = NULL;
-		c6.nextOnFailure = c7;
-		c6.nextOnSuccess = NULL;
-		c7.nextOnFailure = c7.nextOnSuccess = NULL;
+		c5.nextOnFailure = c6._this;
+		c5.nextOnSuccess.is_null = true;
+		c6.nextOnFailure = c7._this;
+		c6.nextOnSuccess.is_null = true;
+		c7.nextOnFailure.is_null = c7.nextOnSuccess.is_null = true;
 
 		ose->LOOKUP_3D[i] = c0;
 	}
@@ -552,12 +560,12 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 	// Point contributions
 	double value = 0;
-	LatticePoint3D *c = &(ose->LOOKUP_3D[index]);
-	while (c != NULL){
+	_LatticePoint3D *c = &(ose->LOOKUP_3D[index]._this);
+	while (!c->is_null){
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
-			c = &(c->nextOnFailure);
+			c = &(ose->LOOKUP_3D[index].nextOnFailure);
 		}
 		else{
 			int pxm = (xrb + c->xrv) & PMASK, pym = (yrb + c->yrv) & PMASK, pzm = (zrb + c->zrv) & PMASK;
@@ -566,7 +574,7 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 			attn *= attn;
 			value += attn * attn * extrapolation;
-			c = &(c->nextOnSuccess);
+			c = &(ose->LOOKUP_3D[index].nextOnSuccess);
 		}
 	}
 	return value;
