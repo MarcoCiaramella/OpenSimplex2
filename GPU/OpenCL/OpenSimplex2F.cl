@@ -5,6 +5,12 @@
 #define N4 0.009202377986303158
 
 
+#define PERIOD 64.0
+#define OFF_X 2048
+#define OFF_Y 2048	
+#define FREQ 1.0 / PERIOD
+
+
 
 
 typedef struct {
@@ -358,7 +364,6 @@ void _loadGrad4ConstArray(OpenSimplexEnv *ose){
 	for (int i = 0; i < PSIZE; i++){
 		ose->GRADIENTS_4D[i] = arr[i % 160];
 	}
-	return gradients4D;
 }
 
 LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
@@ -372,7 +377,7 @@ LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
 }
 
 LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
-	LatticePoint3D *lp3D;
+	LatticePoint3D lp3D;
 	lp3D.dxr = -xrv + lattice * 0.5;
 	lp3D.dyr = -yrv + lattice * 0.5;
 	lp3D.dzr = -zrv + lattice * 0.5;
@@ -655,7 +660,7 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 
 	// Consider opposing vertex pairs of the octahedron formed by the central cross-section of the stretched tesseract
 	double aabb = xsi + ysi - zsi - wsi, abab = xsi - ysi + zsi - wsi, abba = xsi - ysi - zsi + wsi;
-	double aabbScore = abs(aabb), ababScore = abs(abab), abbaScore = abs(abba);
+	double aabbScore = fabs(aabb), ababScore = fabs(abab), abbaScore = fabs(abba);
 
 	// Find the closest point on the stretched tesseract as if it were the upper half
 	int vertexIndex, via, vib;
@@ -876,7 +881,7 @@ __kernel void main(const unsigned int size, __global double* output){
     int index = y*get_global_size(0) + x;
     if (index < size){
         OpenSimplexEnv ose = initOpenSimplex();
-        OpenSimplexGradients osg = newOpenSimplexGradients(ose, 1234);
+        OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
         output[index] = noise2(&ose, &osg, (x + OFF_X) * FREQ, (y + OFF_Y) * FREQ);
     }
 }

@@ -3,6 +3,12 @@
 
 
 
+#define WIDTH 10
+#define HEIGHT 10
+
+
+
+
 void exit_on_error(cl_int res){
      if (res != CL_SUCCESS){
           printf("Error.\n");
@@ -137,6 +143,6 @@ int main(){
      cl_device_id gpu_device;
      get_GPU_platform(&gpu_platform);
      get_GPU_device(gpu_platform, &gpu_device);
-     run_kernel(gpu_device, "OpenSimplex2F.cl", 10, 10);
+     run_kernel(gpu_device, "OpenSimplex2F.cl", WIDTH, HEIGHT);
      return 0;
 }
