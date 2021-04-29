@@ -57,9 +57,9 @@ typedef struct {
 } OpenSimplexGradients;
 
 typedef struct {
-    Grad2 GRADIENTS_2D[24];
-    Grad3 GRADIENTS_3D[48];
-    Grad4 GRADIENTS_4D[160];
+    Grad2 GRADIENTS_2D[PSIZE];
+    Grad3 GRADIENTS_3D[PSIZE];
+    Grad4 GRADIENTS_4D[PSIZE];
     LatticePoint2D LOOKUP_2D[4];
     LatticePoint3D LOOKUP_3D[8];
     LatticePoint4D VERTICES_4D[16];
@@ -521,10 +521,11 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 double noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y){
 
 	// Get points for A2* lattice
-	double s = 0.366025403784439 * (x + y);
+	/*double s = 0.366025403784439 * (x + y);
 	double xs = x + s, ys = y + s;
 
-	return _noise2_Base(ose, osg, xs, ys);
+	return _noise2_Base(ose, osg, xs, ys);*/
+	return 1.0;
 }
 
 /**
