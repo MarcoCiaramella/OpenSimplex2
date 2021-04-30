@@ -24,7 +24,7 @@ typedef struct {
 	bool is_null;
 } _LatticePoint3D;
 
-typedef struct _LatticePoint3D {
+typedef struct {
     _LatticePoint3D _this;
     _LatticePoint3D nextOnFailure;
     _LatticePoint3D nextOnSuccess;
@@ -521,11 +521,10 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 double noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y){
 
 	// Get points for A2* lattice
-	/*double s = 0.366025403784439 * (x + y);
+	double s = 0.366025403784439 * (x + y);
 	double xs = x + s, ys = y + s;
 
-	return _noise2_Base(ose, osg, xs, ys);*/
-	return 1.0;
+	return _noise2_Base(ose, osg, xs, ys);
 }
 
 /**
