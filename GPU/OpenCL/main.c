@@ -1,13 +1,20 @@
 #include <stdio.h>
 #include <CL/cl.h>
+#include "bitmap.h"
+#include <sys/timeb.h>
 
 
 
-#define WIDTH 10
-#define HEIGHT 10
+#define WIDTH 512
+#define HEIGHT 512
 
 
 
+
+float get_time_s(struct timeb start, struct timeb end){
+    unsigned long long ms = (unsigned long long) (1000.0 * (end.time - start.time) + (end.millitm - start.millitm));
+    return ms/1000.0;
+}
 
 void exit_on_error(cl_int res){
      if (res != CL_SUCCESS){
@@ -253,20 +260,30 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "main", &errcode_ret);
-     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, buffer_size_in_bytes, NULL, NULL);
+     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 
      clSetKernelArg(kernel, 0, sizeof(unsigned int), &size);
      clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_output_buffer);
 
+     struct timeb start, end;
+     ftime(&start);
      res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, num_work_groups, work_group_size, 0, NULL, NULL);
+     ftime(&end);
      print_error(res);
+
+     float s = get_time_s(start, end);
+     printf("time: %fs\n", s);
 
      clFinish(queue);
 
-     clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
-
-     for (int i = 0; i < size; i++){
-          printf("val %f\n", output_buffer[i]);
+     //clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
+     output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
+     if (output_buffer != NULL){
+          save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, output_buffer);
+          //free(output_buffer);
+     }
+     else {
+          print_error(res);
      }
 
      clReleaseMemObject(device_output_buffer);
@@ -274,7 +291,6 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      clReleaseKernel(kernel);
      clReleaseCommandQueue(queue);
      clReleaseContext(context);
-     free(output_buffer);
 }
 
 int main(){
@@ -283,6 +299,6 @@ int main(){
      get_GPU_platform(&gpu_platform);
      get_GPU_device(gpu_platform, &gpu_device);
      printf("GPU available memory %llu bytes\n", get_GPU_mem(gpu_device));
-     run_kernel(gpu_device, "OpenSimplex2F.cl", WIDTH, HEIGHT);
+     run_kernel(gpu_device, "OpenSimplex2F_noise2.cl", WIDTH, HEIGHT);
      return 0;
 }
