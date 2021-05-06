@@ -268,13 +268,12 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      struct timeb start, end;
      ftime(&start);
      res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, num_work_groups, work_group_size, 0, NULL, NULL);
-     ftime(&end);
      print_error(res);
+     clFinish(queue);
+     ftime(&end);
 
      float s = get_time_s(start, end);
      printf("time: %fs\n", s);
-
-     clFinish(queue);
 
      //clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
      output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
