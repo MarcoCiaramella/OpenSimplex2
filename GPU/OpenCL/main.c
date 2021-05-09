@@ -238,12 +238,14 @@ void print_build_log_failure(cl_int res, cl_device_id gpu_device, cl_program pro
      }
 }
 
-void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int height){
+void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *ose, size_t ose_size, OpenSimplexGradients *osg, size_t osg_size, int width, int height){
      cl_context context;
      cl_command_queue queue;
      cl_program program;
      cl_kernel kernel;
      cl_int errcode_ret;
+     cl_mem device_OpenSimplexEnv_buffer;
+     cl_mem device_OpenSimplexGradients_buffer;
      cl_mem device_output_buffer;
      double *output_buffer;
      unsigned int size = width * height;
@@ -260,10 +262,8 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "main", &errcode_ret);
-     // TODO
-     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, buffer_size_in_bytes, NULL, NULL);
-     // TODO
-     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, buffer_size_in_bytes, NULL, NULL);
+     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
+     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, buffer_size_in_bytes, NULL, NULL);
      //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 
@@ -307,6 +307,8 @@ int main(){
      get_GPU_platform(&gpu_platform);
      get_GPU_device(gpu_platform, &gpu_device);
      printf("GPU available memory %llu bytes\n", get_GPU_mem(gpu_device));
-     run_kernel(gpu_device, "OpenSimplex2F_noise2.cl", WIDTH, HEIGHT);
+     OpenSimplexEnv ose = initOpenSimplex();
+     OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
+     run_kernel(gpu_device, "OpenSimplex2F_noise2.cl", ose, sizeof(ose), osg, sizeof(osg), WIDTH, HEIGHT);
      return 0;
 }
