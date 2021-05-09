@@ -1,14 +1,5 @@
 #define PSIZE 2048
 #define PMASK 2047
-#define N2 0.01001634121365712
-#define N3 0.030485933181293584
-#define N4 0.009202377986303158
-
-
-#define PERIOD 64.0
-#define OFF_X 2048
-#define OFF_Y 2048	
-#define FREQ 1.0 / PERIOD
 
 
 
@@ -76,404 +67,6 @@ int _fastFloor(double x){
 	return x < xi ? xi - 1 : xi;
 }
 
-Grad2 _newGrad2(double dx, double dy){
-    Grad2 grad2;
-    grad2.dx = dx;
-    grad2.dy = dy;
-    return grad2;
-}
-
-Grad3 _newGrad3(double dx, double dy, double dz){
-    Grad3 grad3;
-    grad3.dx = dx;
-    grad3.dy = dy;
-    grad3.dz = dz;
-    return grad3;
-}
-
-Grad4 _newGrad4(double dx, double dy, double dz, double dw){
-    Grad4 grad4;
-    grad4.dx = dx;
-    grad4.dy = dy;
-    grad4.dz = dz;
-    grad4.dw = dw;
-    return grad4;
-}
-
-void _loadGrad2ConstArray(OpenSimplexEnv *ose){
-    Grad2 arr[24];
-    int i = 0;
-	arr[i++] = _newGrad2(0.130526192220052, 0.99144486137381);
-	arr[i++] = _newGrad2(0.38268343236509, 0.923879532511287);
-	arr[i++] = _newGrad2(0.608761429008721, 0.793353340291235);
-	arr[i++] = _newGrad2(0.793353340291235, 0.608761429008721);
-	arr[i++] = _newGrad2(0.923879532511287, 0.38268343236509);
-	arr[i++] = _newGrad2(0.99144486137381, 0.130526192220051);
-	arr[i++] = _newGrad2(0.99144486137381, -0.130526192220051);
-	arr[i++] = _newGrad2(0.923879532511287, -0.38268343236509);
-	arr[i++] = _newGrad2(0.793353340291235, -0.60876142900872);
-	arr[i++] = _newGrad2(0.608761429008721, -0.793353340291235);
-	arr[i++] = _newGrad2(0.38268343236509, -0.923879532511287);
-	arr[i++] = _newGrad2(0.130526192220052, -0.99144486137381);
-	arr[i++] = _newGrad2(-0.130526192220052, -0.99144486137381);
-	arr[i++] = _newGrad2(-0.38268343236509, -0.923879532511287);
-	arr[i++] = _newGrad2(-0.608761429008721, -0.793353340291235);
-	arr[i++] = _newGrad2(-0.793353340291235, -0.608761429008721);
-	arr[i++] = _newGrad2(-0.923879532511287, -0.38268343236509);
-	arr[i++] = _newGrad2(-0.99144486137381, -0.130526192220052);
-	arr[i++] = _newGrad2(-0.99144486137381, 0.130526192220051);
-	arr[i++] = _newGrad2(-0.923879532511287, 0.38268343236509);
-	arr[i++] = _newGrad2(-0.793353340291235, 0.608761429008721);
-	arr[i++] = _newGrad2(-0.608761429008721, 0.793353340291235);
-	arr[i++] = _newGrad2(-0.38268343236509, 0.923879532511287);
-	arr[i++] = _newGrad2(-0.130526192220052, 0.99144486137381);
-    for (int i = 0; i < 24; i++) {
-        arr[i].dx /= N2;
-        arr[i].dy /= N2;
-    }
-	for (int i = 0; i < PSIZE; i++) {
-        ose->GRADIENTS_2D[i] = arr[i % 24];
-    }
-}
-
-void _loadGrad3ConstArray(OpenSimplexEnv *ose){
-	Grad3 arr[48];
-	int i = 0;
-	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, -1.0);
-	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, 1.0);
-	arr[i++] = _newGrad3(-3.0862664687972017, -1.1721513422464978, 0.0);
-	arr[i++] = _newGrad3(-1.1721513422464978, -3.0862664687972017, 0.0);
-	arr[i++] = _newGrad3(-2.22474487139, -1.0, -2.22474487139);
-	arr[i++] = _newGrad3(-2.22474487139, 1.0, -2.22474487139);
-	arr[i++] = _newGrad3(-1.1721513422464978, 0.0, -3.0862664687972017);
-	arr[i++] = _newGrad3(-3.0862664687972017, 0.0, -1.1721513422464978);
-	arr[i++] = _newGrad3(-2.22474487139, -1.0, 2.22474487139);
-	arr[i++] = _newGrad3(-2.22474487139, 1.0, 2.22474487139);
-	arr[i++] = _newGrad3(-3.0862664687972017, 0.0, 1.1721513422464978);
-	arr[i++] = _newGrad3(-1.1721513422464978, 0.0, 3.0862664687972017);
-	arr[i++] = _newGrad3(-2.22474487139, 2.22474487139, -1.0);
-	arr[i++] = _newGrad3(-2.22474487139, 2.22474487139, 1.0);
-	arr[i++] = _newGrad3(-1.1721513422464978, 3.0862664687972017, 0.0);
-	arr[i++] = _newGrad3(-3.0862664687972017, 1.1721513422464978, 0.0);
-	arr[i++] = _newGrad3(-1.0, -2.22474487139, -2.22474487139);
-	arr[i++] = _newGrad3(1.0, -2.22474487139, -2.22474487139);
-	arr[i++] = _newGrad3(0.0, -3.0862664687972017, -1.1721513422464978);
-	arr[i++] = _newGrad3(0.0, -1.1721513422464978, -3.0862664687972017);
-	arr[i++] = _newGrad3(-1.0, -2.22474487139, 2.22474487139);
-	arr[i++] = _newGrad3(1.0, -2.22474487139, 2.22474487139);
-	arr[i++] = _newGrad3(0.0, -1.1721513422464978, 3.0862664687972017);
-	arr[i++] = _newGrad3(0.0, -3.0862664687972017, 1.1721513422464978);
-	arr[i++] = _newGrad3(-1.0, 2.22474487139, -2.22474487139);
-	arr[i++] = _newGrad3(1.0, 2.22474487139, -2.22474487139);
-	arr[i++] = _newGrad3(0.0, 1.1721513422464978, -3.0862664687972017);
-	arr[i++] = _newGrad3(0.0, 3.0862664687972017, -1.1721513422464978);
-	arr[i++] = _newGrad3(-1.0, 2.22474487139, 2.22474487139);
-	arr[i++] = _newGrad3(1.0, 2.22474487139, 2.22474487139);
-	arr[i++] = _newGrad3(0.0, 3.0862664687972017, 1.1721513422464978);
-	arr[i++] = _newGrad3(0.0, 1.1721513422464978, 3.0862664687972017);
-	arr[i++] = _newGrad3(2.22474487139, -2.22474487139, -1.0);
-	arr[i++] = _newGrad3(2.22474487139, -2.22474487139, 1.0);
-	arr[i++] = _newGrad3(1.1721513422464978, -3.0862664687972017, 0.0);
-	arr[i++] = _newGrad3(3.0862664687972017, -1.1721513422464978, 0.0);
-	arr[i++] = _newGrad3(2.22474487139, -1.0, -2.22474487139);
-	arr[i++] = _newGrad3(2.22474487139, 1.0, -2.22474487139);
-	arr[i++] = _newGrad3(3.0862664687972017, 0.0, -1.1721513422464978);
-	arr[i++] = _newGrad3(1.1721513422464978, 0.0, -3.0862664687972017);
-	arr[i++] = _newGrad3(2.22474487139, -1.0, 2.22474487139);
-	arr[i++] = _newGrad3(2.22474487139, 1.0, 2.22474487139);
-	arr[i++] = _newGrad3(1.1721513422464978, 0.0, 3.0862664687972017);
-	arr[i++] = _newGrad3(3.0862664687972017, 0.0, 1.1721513422464978);
-	arr[i++] = _newGrad3(2.22474487139, 2.22474487139, -1.0);
-	arr[i++] = _newGrad3(2.22474487139, 2.22474487139, 1.0);
-	arr[i++] = _newGrad3(3.0862664687972017, 1.1721513422464978, 0.0);
-	arr[i++] = _newGrad3(1.1721513422464978, 3.0862664687972017, 0.0);
-	for (int i = 0; i < 48; i++){
-		arr[i].dx /= N3;
-		arr[i].dy /= N3;
-		arr[i].dz /= N3;
-	}
-	for (int i = 0; i < PSIZE; i++){
-		ose->GRADIENTS_3D[i] = arr[i % 48];
-	}
-}
-
-void _loadGrad4ConstArray(OpenSimplexEnv *ose){
-	Grad4 arr[160];
-	int i = 0;
-	arr[i++] = _newGrad4(-0.753341017856078, -0.37968289875261624, -0.37968289875261624, -0.37968289875261624);
-	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, -0.4321472685365301, 0.12128480194602098);
-	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, 0.12128480194602098, -0.4321472685365301);
-	arr[i++] = _newGrad4(-0.7821684431180708, 0.12128480194602098, -0.4321472685365301, -0.4321472685365301);
-	arr[i++] = _newGrad4(-0.8586508742123365, -0.508629699630796, 0.044802370851755174, 0.044802370851755174);
-	arr[i++] = _newGrad4(-0.8586508742123365, 0.044802370851755174, -0.508629699630796, 0.044802370851755174);
-	arr[i++] = _newGrad4(-0.8586508742123365, 0.044802370851755174, 0.044802370851755174, -0.508629699630796);
-	arr[i++] = _newGrad4(-0.9982828964265062, -0.03381941603233842, -0.03381941603233842, -0.03381941603233842);
-	arr[i++] = _newGrad4(-0.37968289875261624, -0.753341017856078, -0.37968289875261624, -0.37968289875261624);
-	arr[i++] = _newGrad4(-0.4321472685365301, -0.7821684431180708, -0.4321472685365301, 0.12128480194602098);
-	arr[i++] = _newGrad4(-0.4321472685365301, -0.7821684431180708, 0.12128480194602098, -0.4321472685365301);
-	arr[i++] = _newGrad4(0.12128480194602098, -0.7821684431180708, -0.4321472685365301, -0.4321472685365301);
-	arr[i++] = _newGrad4(-0.508629699630796, -0.8586508742123365, 0.044802370851755174, 0.044802370851755174);
-	arr[i++] = _newGrad4(0.044802370851755174, -0.8586508742123365, -0.508629699630796, 0.044802370851755174);
-	arr[i++] = _newGrad4(0.044802370851755174, -0.8586508742123365, 0.044802370851755174, -0.508629699630796);
-	arr[i++] = _newGrad4(-0.03381941603233842, -0.9982828964265062, -0.03381941603233842, -0.03381941603233842);
-	arr[i++] = _newGrad4(-0.37968289875261624, -0.37968289875261624, -0.753341017856078, -0.37968289875261624);
-	arr[i++] = _newGrad4(-0.4321472685365301, -0.4321472685365301, -0.7821684431180708, 0.12128480194602098);
-	arr[i++] = _newGrad4(-0.4321472685365301, 0.12128480194602098, -0.7821684431180708, -0.4321472685365301);
-	arr[i++] = _newGrad4(0.12128480194602098, -0.4321472685365301, -0.7821684431180708, -0.4321472685365301);
-	arr[i++] = _newGrad4(-0.508629699630796, 0.044802370851755174, -0.8586508742123365, 0.044802370851755174);
-	arr[i++] = _newGrad4(0.044802370851755174, -0.508629699630796, -0.8586508742123365, 0.044802370851755174);
-	arr[i++] = _newGrad4(0.044802370851755174, 0.044802370851755174, -0.8586508742123365, -0.508629699630796);
-	arr[i++] = _newGrad4(-0.03381941603233842, -0.03381941603233842, -0.9982828964265062, -0.03381941603233842);
-	arr[i++] = _newGrad4(-0.37968289875261624, -0.37968289875261624, -0.37968289875261624, -0.753341017856078);
-	arr[i++] = _newGrad4(-0.4321472685365301, -0.4321472685365301, 0.12128480194602098, -0.7821684431180708);
-	arr[i++] = _newGrad4(-0.4321472685365301, 0.12128480194602098, -0.4321472685365301, -0.7821684431180708);
-	arr[i++] = _newGrad4(0.12128480194602098, -0.4321472685365301, -0.4321472685365301, -0.7821684431180708);
-	arr[i++] = _newGrad4(-0.508629699630796, 0.044802370851755174, 0.044802370851755174, -0.8586508742123365);
-	arr[i++] = _newGrad4(0.044802370851755174, -0.508629699630796, 0.044802370851755174, -0.8586508742123365);
-	arr[i++] = _newGrad4(0.044802370851755174, 0.044802370851755174, -0.508629699630796, -0.8586508742123365);
-	arr[i++] = _newGrad4(-0.03381941603233842, -0.03381941603233842, -0.03381941603233842, -0.9982828964265062);
-	arr[i++] = _newGrad4(-0.6740059517812944, -0.3239847771997537, -0.3239847771997537, 0.5794684678643381);
-	arr[i++] = _newGrad4(-0.7504883828755602, -0.4004672082940195, 0.15296486218853164, 0.5029860367700724);
-	arr[i++] = _newGrad4(-0.7504883828755602, 0.15296486218853164, -0.4004672082940195, 0.5029860367700724);
-	arr[i++] = _newGrad4(-0.8828161875373585, 0.08164729285680945, 0.08164729285680945, 0.4553054119602712);
-	arr[i++] = _newGrad4(-0.4553054119602712, -0.08164729285680945, -0.08164729285680945, 0.8828161875373585);
-	arr[i++] = _newGrad4(-0.5029860367700724, -0.15296486218853164, 0.4004672082940195, 0.7504883828755602);
-	arr[i++] = _newGrad4(-0.5029860367700724, 0.4004672082940195, -0.15296486218853164, 0.7504883828755602);
-	arr[i++] = _newGrad4(-0.5794684678643381, 0.3239847771997537, 0.3239847771997537, 0.6740059517812944);
-	arr[i++] = _newGrad4(-0.3239847771997537, -0.6740059517812944, -0.3239847771997537, 0.5794684678643381);
-	arr[i++] = _newGrad4(-0.4004672082940195, -0.7504883828755602, 0.15296486218853164, 0.5029860367700724);
-	arr[i++] = _newGrad4(0.15296486218853164, -0.7504883828755602, -0.4004672082940195, 0.5029860367700724);
-	arr[i++] = _newGrad4(0.08164729285680945, -0.8828161875373585, 0.08164729285680945, 0.4553054119602712);
-	arr[i++] = _newGrad4(-0.08164729285680945, -0.4553054119602712, -0.08164729285680945, 0.8828161875373585);
-	arr[i++] = _newGrad4(-0.15296486218853164, -0.5029860367700724, 0.4004672082940195, 0.7504883828755602);
-	arr[i++] = _newGrad4(0.4004672082940195, -0.5029860367700724, -0.15296486218853164, 0.7504883828755602);
-	arr[i++] = _newGrad4(0.3239847771997537, -0.5794684678643381, 0.3239847771997537, 0.6740059517812944);
-	arr[i++] = _newGrad4(-0.3239847771997537, -0.3239847771997537, -0.6740059517812944, 0.5794684678643381);
-	arr[i++] = _newGrad4(-0.4004672082940195, 0.15296486218853164, -0.7504883828755602, 0.5029860367700724);
-	arr[i++] = _newGrad4(0.15296486218853164, -0.4004672082940195, -0.7504883828755602, 0.5029860367700724);
-	arr[i++] = _newGrad4(0.08164729285680945, 0.08164729285680945, -0.8828161875373585, 0.4553054119602712);
-	arr[i++] = _newGrad4(-0.08164729285680945, -0.08164729285680945, -0.4553054119602712, 0.8828161875373585);
-	arr[i++] = _newGrad4(-0.15296486218853164, 0.4004672082940195, -0.5029860367700724, 0.7504883828755602);
-	arr[i++] = _newGrad4(0.4004672082940195, -0.15296486218853164, -0.5029860367700724, 0.7504883828755602);
-	arr[i++] = _newGrad4(0.3239847771997537, 0.3239847771997537, -0.5794684678643381, 0.6740059517812944);
-	arr[i++] = _newGrad4(-0.6740059517812944, -0.3239847771997537, 0.5794684678643381, -0.3239847771997537);
-	arr[i++] = _newGrad4(-0.7504883828755602, -0.4004672082940195, 0.5029860367700724, 0.15296486218853164);
-	arr[i++] = _newGrad4(-0.7504883828755602, 0.15296486218853164, 0.5029860367700724, -0.4004672082940195);
-	arr[i++] = _newGrad4(-0.8828161875373585, 0.08164729285680945, 0.4553054119602712, 0.08164729285680945);
-	arr[i++] = _newGrad4(-0.4553054119602712, -0.08164729285680945, 0.8828161875373585, -0.08164729285680945);
-	arr[i++] = _newGrad4(-0.5029860367700724, -0.15296486218853164, 0.7504883828755602, 0.4004672082940195);
-	arr[i++] = _newGrad4(-0.5029860367700724, 0.4004672082940195, 0.7504883828755602, -0.15296486218853164);
-	arr[i++] = _newGrad4(-0.5794684678643381, 0.3239847771997537, 0.6740059517812944, 0.3239847771997537);
-	arr[i++] = _newGrad4(-0.3239847771997537, -0.6740059517812944, 0.5794684678643381, -0.3239847771997537);
-	arr[i++] = _newGrad4(-0.4004672082940195, -0.7504883828755602, 0.5029860367700724, 0.15296486218853164);
-	arr[i++] = _newGrad4(0.15296486218853164, -0.7504883828755602, 0.5029860367700724, -0.4004672082940195);
-	arr[i++] = _newGrad4(0.08164729285680945, -0.8828161875373585, 0.4553054119602712, 0.08164729285680945);
-	arr[i++] = _newGrad4(-0.08164729285680945, -0.4553054119602712, 0.8828161875373585, -0.08164729285680945);
-	arr[i++] = _newGrad4(-0.15296486218853164, -0.5029860367700724, 0.7504883828755602, 0.4004672082940195);
-	arr[i++] = _newGrad4(0.4004672082940195, -0.5029860367700724, 0.7504883828755602, -0.15296486218853164);
-	arr[i++] = _newGrad4(0.3239847771997537, -0.5794684678643381, 0.6740059517812944, 0.3239847771997537);
-	arr[i++] = _newGrad4(-0.3239847771997537, -0.3239847771997537, 0.5794684678643381, -0.6740059517812944);
-	arr[i++] = _newGrad4(-0.4004672082940195, 0.15296486218853164, 0.5029860367700724, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.15296486218853164, -0.4004672082940195, 0.5029860367700724, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.08164729285680945, 0.08164729285680945, 0.4553054119602712, -0.8828161875373585);
-	arr[i++] = _newGrad4(-0.08164729285680945, -0.08164729285680945, 0.8828161875373585, -0.4553054119602712);
-	arr[i++] = _newGrad4(-0.15296486218853164, 0.4004672082940195, 0.7504883828755602, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.4004672082940195, -0.15296486218853164, 0.7504883828755602, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.3239847771997537, 0.3239847771997537, 0.6740059517812944, -0.5794684678643381);
-	arr[i++] = _newGrad4(-0.6740059517812944, 0.5794684678643381, -0.3239847771997537, -0.3239847771997537);
-	arr[i++] = _newGrad4(-0.7504883828755602, 0.5029860367700724, -0.4004672082940195, 0.15296486218853164);
-	arr[i++] = _newGrad4(-0.7504883828755602, 0.5029860367700724, 0.15296486218853164, -0.4004672082940195);
-	arr[i++] = _newGrad4(-0.8828161875373585, 0.4553054119602712, 0.08164729285680945, 0.08164729285680945);
-	arr[i++] = _newGrad4(-0.4553054119602712, 0.8828161875373585, -0.08164729285680945, -0.08164729285680945);
-	arr[i++] = _newGrad4(-0.5029860367700724, 0.7504883828755602, -0.15296486218853164, 0.4004672082940195);
-	arr[i++] = _newGrad4(-0.5029860367700724, 0.7504883828755602, 0.4004672082940195, -0.15296486218853164);
-	arr[i++] = _newGrad4(-0.5794684678643381, 0.6740059517812944, 0.3239847771997537, 0.3239847771997537);
-	arr[i++] = _newGrad4(-0.3239847771997537, 0.5794684678643381, -0.6740059517812944, -0.3239847771997537);
-	arr[i++] = _newGrad4(-0.4004672082940195, 0.5029860367700724, -0.7504883828755602, 0.15296486218853164);
-	arr[i++] = _newGrad4(0.15296486218853164, 0.5029860367700724, -0.7504883828755602, -0.4004672082940195);
-	arr[i++] = _newGrad4(0.08164729285680945, 0.4553054119602712, -0.8828161875373585, 0.08164729285680945);
-	arr[i++] = _newGrad4(-0.08164729285680945, 0.8828161875373585, -0.4553054119602712, -0.08164729285680945);
-	arr[i++] = _newGrad4(-0.15296486218853164, 0.7504883828755602, -0.5029860367700724, 0.4004672082940195);
-	arr[i++] = _newGrad4(0.4004672082940195, 0.7504883828755602, -0.5029860367700724, -0.15296486218853164);
-	arr[i++] = _newGrad4(0.3239847771997537, 0.6740059517812944, -0.5794684678643381, 0.3239847771997537);
-	arr[i++] = _newGrad4(-0.3239847771997537, 0.5794684678643381, -0.3239847771997537, -0.6740059517812944);
-	arr[i++] = _newGrad4(-0.4004672082940195, 0.5029860367700724, 0.15296486218853164, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.15296486218853164, 0.5029860367700724, -0.4004672082940195, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.08164729285680945, 0.4553054119602712, 0.08164729285680945, -0.8828161875373585);
-	arr[i++] = _newGrad4(-0.08164729285680945, 0.8828161875373585, -0.08164729285680945, -0.4553054119602712);
-	arr[i++] = _newGrad4(-0.15296486218853164, 0.7504883828755602, 0.4004672082940195, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.4004672082940195, 0.7504883828755602, -0.15296486218853164, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.3239847771997537, 0.6740059517812944, 0.3239847771997537, -0.5794684678643381);
-	arr[i++] = _newGrad4(0.5794684678643381, -0.6740059517812944, -0.3239847771997537, -0.3239847771997537);
-	arr[i++] = _newGrad4(0.5029860367700724, -0.7504883828755602, -0.4004672082940195, 0.15296486218853164);
-	arr[i++] = _newGrad4(0.5029860367700724, -0.7504883828755602, 0.15296486218853164, -0.4004672082940195);
-	arr[i++] = _newGrad4(0.4553054119602712, -0.8828161875373585, 0.08164729285680945, 0.08164729285680945);
-	arr[i++] = _newGrad4(0.8828161875373585, -0.4553054119602712, -0.08164729285680945, -0.08164729285680945);
-	arr[i++] = _newGrad4(0.7504883828755602, -0.5029860367700724, -0.15296486218853164, 0.4004672082940195);
-	arr[i++] = _newGrad4(0.7504883828755602, -0.5029860367700724, 0.4004672082940195, -0.15296486218853164);
-	arr[i++] = _newGrad4(0.6740059517812944, -0.5794684678643381, 0.3239847771997537, 0.3239847771997537);
-	arr[i++] = _newGrad4(0.5794684678643381, -0.3239847771997537, -0.6740059517812944, -0.3239847771997537);
-	arr[i++] = _newGrad4(0.5029860367700724, -0.4004672082940195, -0.7504883828755602, 0.15296486218853164);
-	arr[i++] = _newGrad4(0.5029860367700724, 0.15296486218853164, -0.7504883828755602, -0.4004672082940195);
-	arr[i++] = _newGrad4(0.4553054119602712, 0.08164729285680945, -0.8828161875373585, 0.08164729285680945);
-	arr[i++] = _newGrad4(0.8828161875373585, -0.08164729285680945, -0.4553054119602712, -0.08164729285680945);
-	arr[i++] = _newGrad4(0.7504883828755602, -0.15296486218853164, -0.5029860367700724, 0.4004672082940195);
-	arr[i++] = _newGrad4(0.7504883828755602, 0.4004672082940195, -0.5029860367700724, -0.15296486218853164);
-	arr[i++] = _newGrad4(0.6740059517812944, 0.3239847771997537, -0.5794684678643381, 0.3239847771997537);
-	arr[i++] = _newGrad4(0.5794684678643381, -0.3239847771997537, -0.3239847771997537, -0.6740059517812944);
-	arr[i++] = _newGrad4(0.5029860367700724, -0.4004672082940195, 0.15296486218853164, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.5029860367700724, 0.15296486218853164, -0.4004672082940195, -0.7504883828755602);
-	arr[i++] = _newGrad4(0.4553054119602712, 0.08164729285680945, 0.08164729285680945, -0.8828161875373585);
-	arr[i++] = _newGrad4(0.8828161875373585, -0.08164729285680945, -0.08164729285680945, -0.4553054119602712);
-	arr[i++] = _newGrad4(0.7504883828755602, -0.15296486218853164, 0.4004672082940195, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.7504883828755602, 0.4004672082940195, -0.15296486218853164, -0.5029860367700724);
-	arr[i++] = _newGrad4(0.6740059517812944, 0.3239847771997537, 0.3239847771997537, -0.5794684678643381);
-	arr[i++] = _newGrad4(0.03381941603233842, 0.03381941603233842, 0.03381941603233842, 0.9982828964265062);
-	arr[i++] = _newGrad4(-0.044802370851755174, -0.044802370851755174, 0.508629699630796, 0.8586508742123365);
-	arr[i++] = _newGrad4(-0.044802370851755174, 0.508629699630796, -0.044802370851755174, 0.8586508742123365);
-	arr[i++] = _newGrad4(-0.12128480194602098, 0.4321472685365301, 0.4321472685365301, 0.7821684431180708);
-	arr[i++] = _newGrad4(0.508629699630796, -0.044802370851755174, -0.044802370851755174, 0.8586508742123365);
-	arr[i++] = _newGrad4(0.4321472685365301, -0.12128480194602098, 0.4321472685365301, 0.7821684431180708);
-	arr[i++] = _newGrad4(0.4321472685365301, 0.4321472685365301, -0.12128480194602098, 0.7821684431180708);
-	arr[i++] = _newGrad4(0.37968289875261624, 0.37968289875261624, 0.37968289875261624, 0.753341017856078);
-	arr[i++] = _newGrad4(0.03381941603233842, 0.03381941603233842, 0.9982828964265062, 0.03381941603233842);
-	arr[i++] = _newGrad4(-0.044802370851755174, 0.044802370851755174, 0.8586508742123365, 0.508629699630796);
-	arr[i++] = _newGrad4(-0.044802370851755174, 0.508629699630796, 0.8586508742123365, -0.044802370851755174);
-	arr[i++] = _newGrad4(-0.12128480194602098, 0.4321472685365301, 0.7821684431180708, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.508629699630796, -0.044802370851755174, 0.8586508742123365, -0.044802370851755174);
-	arr[i++] = _newGrad4(0.4321472685365301, -0.12128480194602098, 0.7821684431180708, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.4321472685365301, 0.4321472685365301, 0.7821684431180708, -0.12128480194602098);
-	arr[i++] = _newGrad4(0.37968289875261624, 0.37968289875261624, 0.753341017856078, 0.37968289875261624);
-	arr[i++] = _newGrad4(0.03381941603233842, 0.9982828964265062, 0.03381941603233842, 0.03381941603233842);
-	arr[i++] = _newGrad4(-0.044802370851755174, 0.8586508742123365, -0.044802370851755174, 0.508629699630796);
-	arr[i++] = _newGrad4(-0.044802370851755174, 0.8586508742123365, 0.508629699630796, -0.044802370851755174);
-	arr[i++] = _newGrad4(-0.12128480194602098, 0.7821684431180708, 0.4321472685365301, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.508629699630796, 0.8586508742123365, -0.044802370851755174, -0.044802370851755174);
-	arr[i++] = _newGrad4(0.4321472685365301, 0.7821684431180708, -0.12128480194602098, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.4321472685365301, 0.7821684431180708, 0.4321472685365301, -0.12128480194602098);
-	arr[i++] = _newGrad4(0.37968289875261624, 0.753341017856078, 0.37968289875261624, 0.37968289875261624);
-	arr[i++] = _newGrad4(0.9982828964265062, 0.03381941603233842, 0.03381941603233842, 0.03381941603233842);
-	arr[i++] = _newGrad4(0.8586508742123365, -0.044802370851755174, -0.044802370851755174, 0.508629699630796);
-	arr[i++] = _newGrad4(0.8586508742123365, -0.044802370851755174, 0.508629699630796, -0.044802370851755174);
-	arr[i++] = _newGrad4(0.7821684431180708, -0.12128480194602098, 0.4321472685365301, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.8586508742123365, 0.508629699630796, -0.044802370851755174, -0.044802370851755174);
-	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, -0.12128480194602098, 0.4321472685365301);
-	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, 0.4321472685365301, -0.12128480194602098);
-	arr[i++] = _newGrad4(0.753341017856078, 0.37968289875261624, 0.37968289875261624, 0.37968289875261624);
-	for (int i = 0; i < 160; i++){
-		arr[i].dx /= N4;
-		arr[i].dy /= N4;
-		arr[i].dz /= N4;
-		arr[i].dw /= N4;
-	}
-	for (int i = 0; i < PSIZE; i++){
-		ose->GRADIENTS_4D[i] = arr[i % 160];
-	}
-}
-
-LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
-	LatticePoint2D lp2D;
-	lp2D.xsv = xsv;
-	lp2D.ysv = ysv;
-	double ssv = (xsv + ysv) * -0.211324865405187;
-	lp2D.dx = -xsv - ssv;
-	lp2D.dy = -ysv - ssv;
-	return lp2D;
-}
-
-LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
-	LatticePoint3D lp3D;
-	lp3D._this.dxr = -xrv + lattice * 0.5;
-	lp3D._this.dyr = -yrv + lattice * 0.5;
-	lp3D._this.dzr = -zrv + lattice * 0.5;
-	lp3D._this.xrv = xrv + lattice * 1024;
-	lp3D._this.yrv = yrv + lattice * 1024;
-	lp3D._this.zrv = zrv + lattice * 1024;
-	lp3D._this.is_null = false;
-	lp3D.nextOnFailure.is_null = false;
-	lp3D.nextOnSuccess.is_null = false;
-	return lp3D;
-}
-
-LatticePoint4D _newLatticePoint4D(int xsv, int ysv, int zsv, int wsv){
-	LatticePoint4D lp4D;
-	lp4D.xsv = xsv + 409;
-	lp4D.ysv = ysv + 409;
-	lp4D.zsv = zsv + 409;
-	lp4D.wsv = wsv + 409;
-	double ssv = (xsv + ysv + zsv + wsv) * 0.309016994374947;
-	lp4D.dx = -xsv - ssv;
-	lp4D.dy = -ysv - ssv;
-	lp4D.dz = -zsv - ssv;
-	lp4D.dw = -wsv - ssv;
-	lp4D.xsi = 0.2 - xsv;
-	lp4D.ysi = 0.2 - ysv;
-	lp4D.zsi = 0.2 - zsv;
-	lp4D.wsi = 0.2 - wsv;
-	lp4D.ssiDelta = (0.8 - xsv - ysv - zsv - wsv) * 0.309016994374947;
-	return lp4D;
-}
-
-void _loadLatticePoint2DConstArray(OpenSimplexEnv *ose){
-	ose->LOOKUP_2D[0] = _newLatticePoint2D(1, 0);
-	ose->LOOKUP_2D[1] = _newLatticePoint2D(0, 0);
-	ose->LOOKUP_2D[2] = _newLatticePoint2D(1, 1);
-	ose->LOOKUP_2D[3] = _newLatticePoint2D(0, 1);
-}
-
-void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
-	for (int i = 0; i < 8; i++){
-		int i1, j1, k1, i2, j2, k2;
-		i1 = (i >> 0) & 1;
-		j1 = (i >> 1) & 1;
-		k1 = (i >> 2) & 1;
-		i2 = i1 ^ 1;
-		j2 = j1 ^ 1;
-		k2 = k1 ^ 1;
-
-		// The two points within this octant, one from each of the two cubic half-lattices.
-		LatticePoint3D c0 = _newLatticePoint3D(i1, j1, k1, 0);
-		LatticePoint3D c1 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + k2, 1);
-
-		// Each single step away on the first half-lattice.
-		LatticePoint3D c2 = _newLatticePoint3D(i1 ^ 1, j1, k1, 0);
-		LatticePoint3D c3 = _newLatticePoint3D(i1, j1 ^ 1, k1, 0);
-		LatticePoint3D c4 = _newLatticePoint3D(i1, j1, k1 ^ 1, 0);
-
-		// Each single step away on the second half-lattice.
-		LatticePoint3D c5 = _newLatticePoint3D(i1 + (i2 ^ 1), j1 + j2, k1 + k2, 1);
-		LatticePoint3D c6 = _newLatticePoint3D(i1 + i2, j1 + (j2 ^ 1), k1 + k2, 1);
-		LatticePoint3D c7 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
-
-		// First two are guaranteed.
-		c0.nextOnFailure = c0.nextOnSuccess = c1._this;
-		c1.nextOnFailure = c1.nextOnSuccess = c2._this;
-
-		// Once we find one on the first half-lattice, the rest are out.
-		// In addition, knowing c2 rules out c5.
-		c2.nextOnFailure = c3._this;
-		c2.nextOnSuccess = c6._this;
-		c3.nextOnFailure = c4._this;
-		c3.nextOnSuccess = c5._this;
-		c4.nextOnFailure = c4.nextOnSuccess = c5._this;
-
-		// Once we find one on the second half-lattice, the rest are out.
-		c5.nextOnFailure = c6._this;
-		c5.nextOnSuccess.is_null = true;
-		c6.nextOnFailure = c7._this;
-		c6.nextOnSuccess.is_null = true;
-		c7.nextOnFailure.is_null = c7.nextOnSuccess.is_null = true;
-
-		ose->LOOKUP_3D[i] = c0;
-	}
-}
-
-void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
-	for (int i = 0; i < 16; i++) {
-		ose->VERTICES_4D[i] = _newLatticePoint4D((i >> 0) & 1, (i >> 1) & 1, (i >> 2) & 1, (i >> 3) & 1);
-	}
-}
-
 /*
 	 * Noise Evaluators
 	 */
@@ -518,7 +111,7 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 /**
 	 * 2D Simplex noise, standard lattice orientation.
 	 */
-double noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y){
+__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
 
 	// Get points for A2* lattice
 	double s = 0.366025403784439 * (x + y);
@@ -532,7 +125,7 @@ double noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y
 	 * Might be better for a 2D sandbox style game, where Y is vertical.
 	 * Probably slightly less optimal for heightmaps or continent maps.
 	 */
-double noise2_XBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y){
+__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
 
 	// Skew transform and rotation baked into one.
 	double xx = x * 0.7071067811865476;
@@ -585,7 +178,7 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 	 * Proper substitute for 3D Simplex in light of Forbidden Formulae.
 	 * Use noise3_XYBeforeZ or noise3_XZBeforeY instead, wherever appropriate.
 	 */
-double noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z){
+__kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices via rotation, to produce the expected look on cardinal planar slices.
 	// If texturing objects that don't tend to have cardinal plane faces, you could even remove this.
@@ -605,7 +198,7 @@ double noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, 
 	 * If Z is vertical in world coordinates, call noise3_XYBeforeZ(x, y, Z).
 	 * For a time varied animation, call noise3_XYBeforeZ(x, y, T).
 	 */
-double noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z){
+__kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices without skewing, to make X and Y triangular like 2D.
 	// Orthonormal rotation. Not a skew transform.
@@ -627,7 +220,7 @@ double noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x
 	 * If Z is vertical in world coordinates, call noise3_XZBeforeY(x, Z, y) or use noise3_XYBeforeZ.
 	 * For a time varied animation, call noise3_XZBeforeY(x, T, y) or use noise3_XYBeforeZ.
 	 */
-double noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z){
+__kernel void noise3_XZBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices without skewing, to make X and Z triangular like 2D.
 	// Orthonormal rotation. Not a skew transform.
@@ -800,7 +393,7 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 /**
 	 * 4D OpenSimplex2F noise, classic lattice orientation.
 	 */
-double noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w){
+__kernel void noise4_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	// Get points for A4 lattice
 	double s = -0.138196601125011 * (x + y + z + w);
@@ -814,7 +407,7 @@ double noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, 
 	 * Recommended for 3D terrain, where X and Y (or Z and W) are horizontal.
 	 * Recommended for noise(x, y, sin(time), cos(time)) trick.
 	 */
-double noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w){
+__kernel void noise4_XYBeforeZW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
 	double t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
@@ -827,7 +420,7 @@ double noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double 
 	 * 4D OpenSimplex2F noise, with XZ and YW forming orthogonal triangular-based planes.
 	 * Recommended for 3D terrain, where X and Z (or Y and W) are horizontal.
 	 */
-double noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w){
+__kernel void noise4_XZBeforeYW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
 	double t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
@@ -841,7 +434,7 @@ double noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double 
 	 * and W for an extra degree of freedom. W repeats eventually.
 	 * Recommended for time-varied animations which texture a 3D object (W=time)
 	 */
-double noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double x, double y, double z, double w){
+__kernel void noise4_XYZBeforeW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double xyz = x + y + z;
 	double ww = w * 0.2236067977499788;
@@ -851,37 +444,13 @@ double noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double 
 	return _noise4_Base(ose, osg, xs, ys, zs, ws);
 }
 
-OpenSimplexEnv initOpenSimplex(){
-	OpenSimplexEnv ose;
-	_loadGrad2ConstArray(&ose);
-	_loadGrad3ConstArray(&ose);
-	_loadGrad4ConstArray(&ose);
-	_loadLatticePoint2DConstArray(&ose);
-	_loadLatticePoint3DConstArray(&ose);
-	_loadLatticePoint4DConstArray(&ose);
-	return ose;
-}
 
-OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, long seed){
-    OpenSimplexGradients osg;
-    short source[PSIZE];
-    for (short i = 0; i < PSIZE; i++){
-        source[i] = i;
-    }
-    for (int i = PSIZE - 1; i >= 0; i--){
-        seed = seed * 6364136223846793005L + 1442695040888963407L;
-		int r = (int)((seed + 31) % (i + 1));
-		if (r < 0){
-            r += (i + 1);
-        }
-		osg.perm[i] = source[r];
-		osg.permGrad2[i] = ose->GRADIENTS_2D[osg.perm[i]];
-		osg.permGrad3[i] = ose->GRADIENTS_3D[osg.perm[i]];
-		osg.permGrad4[i] = ose->GRADIENTS_4D[osg.perm[i]];
-		source[r] = source[i];
-    }
-	return osg;
-}
+
+
+#define PERIOD 64.0
+#define OFF_X 2048
+#define OFF_Y 2048	
+#define FREQ 1.0 / PERIOD
 
 __kernel void main(const unsigned int size, __global double* output){
     int x = get_global_id(0);

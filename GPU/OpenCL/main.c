@@ -260,8 +260,12 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "main", &errcode_ret);
-     //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, buffer_size_in_bytes, NULL, NULL);
-     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
+     // TODO
+     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, buffer_size_in_bytes, NULL, NULL);
+     // TODO
+     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, buffer_size_in_bytes, NULL, NULL);
+     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, buffer_size_in_bytes, NULL, NULL);
+     //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 
      clSetKernelArg(kernel, 0, sizeof(unsigned int), &size);
      clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_output_buffer);
@@ -276,11 +280,11 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, int width, int h
      printf("clFinish() time: %fs\n", get_time_s(start, end));
 
      ftime(&start);
-     //clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
-     output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
+     clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
+     //output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
      ftime(&end);
-     //printf("clEnqueueReadBuffer() time: %fs\n", get_time_s(start, end));
-     printf("clEnqueueMapBuffer() time: %fs\n", get_time_s(start, end));
+     printf("clEnqueueReadBuffer() time: %fs\n", get_time_s(start, end));
+     //printf("clEnqueueMapBuffer() time: %fs\n", get_time_s(start, end));
 
      if (output_buffer != NULL){
           save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, output_buffer);
