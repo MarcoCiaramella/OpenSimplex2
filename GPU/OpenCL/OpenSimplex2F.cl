@@ -1,5 +1,10 @@
 #define PSIZE 2048
 #define PMASK 2047
+#define PERIOD 64.0
+#define OFF_X 2048
+#define OFF_Y 2048	
+#define FREQ 1.0 / PERIOD
+
 
 
 
@@ -58,6 +63,22 @@ typedef struct {
 
 
 
+int get_index(){
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	return y*get_global_size(0) + x;
+}
+
+double get_x(){
+	int x = get_global_id(0);
+	return (x + OFF_X) * FREQ;
+}
+
+double get_y(){
+	int y = get_global_id(1);
+	return (y + OFF_Y) * FREQ;
+}
+
 /*
 	 * Utility
 	 */
@@ -93,6 +114,7 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 		LatticePoint2D *c = &(ose->LOOKUP_2D[index + i]);
 
 		double dx = xi + c->dx, dy = yi + c->dy;
+		printf("ok\n");
 		double attn = 0.5 - dx * dx - dy * dy;
 		if (attn <= 0)
 			continue;
@@ -111,13 +133,19 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 /**
 	 * 2D Simplex noise, standard lattice orientation.
 	 */
-__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
+__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int size, __global double* output){
 
-	// Get points for A2* lattice
-	double s = 0.366025403784439 * (x + y);
-	double xs = x + s, ys = y + s;
+	int index = get_index();
+    if (index < size){
 
-	return _noise2_Base(ose, osg, xs, ys);
+		double x = get_x();
+		double y = get_y();
+		// Get points for A2* lattice
+		double s = 0.366025403784439 * (x + y);
+		double xs = x + s, ys = y + s;
+
+		output[index] = _noise2_Base(ose, osg, xs, ys);
+	}
 }
 
 /**
@@ -125,14 +153,14 @@ __kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients
 	 * Might be better for a 2D sandbox style game, where Y is vertical.
 	 * Probably slightly less optimal for heightmaps or continent maps.
 	 */
-__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
+/*__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
 
 	// Skew transform and rotation baked into one.
 	double xx = x * 0.7071067811865476;
 	double yy = y * 1.224744871380249;
 
 	return _noise2_Base(ose, osg, yy + xx, yy - xx);
-}
+}*/
 
 /**
 	 * Generate overlapping cubic lattices for 3D Re-oriented BCC noise.
@@ -140,7 +168,7 @@ __kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplex
 	 * It was actually faster to narrow down the points in the loop itself,
 	 * than to build up the index with enough info to isolate 4 points.
 	 */
-double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, double yr, double zr){
+/*double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, double yr, double zr){
 
 	// Get base and offsets inside cube of first lattice.
 	int xrb = _fastFloor(xr), yrb = _fastFloor(yr), zrb = _fastFloor(zr);
@@ -171,14 +199,14 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 		}
 	}
 	return value;
-}
+}*/
 
 /**
 	 * 3D Re-oriented 4-point BCC noise, classic orientation.
 	 * Proper substitute for 3D Simplex in light of Forbidden Formulae.
 	 * Use noise3_XYBeforeZ or noise3_XZBeforeY instead, wherever appropriate.
 	 */
-__kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
+/*__kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices via rotation, to produce the expected look on cardinal planar slices.
 	// If texturing objects that don't tend to have cardinal plane faces, you could even remove this.
@@ -188,7 +216,7 @@ __kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexG
 
 	// Evaluate both lattices to form a BCC lattice.
 	return _noise3_BCC(ose, osg, xr, yr, zr);
-}
+}*/
 
 /**
 	 * 3D Re-oriented 4-point BCC noise, with better visual isotropy in (X, Y).
@@ -198,7 +226,7 @@ __kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexG
 	 * If Z is vertical in world coordinates, call noise3_XYBeforeZ(x, y, Z).
 	 * For a time varied animation, call noise3_XYBeforeZ(x, y, T).
 	 */
-__kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
+/*__kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices without skewing, to make X and Y triangular like 2D.
 	// Orthonormal rotation. Not a skew transform.
@@ -210,7 +238,7 @@ __kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimple
 
 	// Evaluate both lattices to form a BCC lattice.
 	return _noise3_BCC(ose, osg, xr, yr, zr);
-}
+}*/
 
 /**
 	 * 3D Re-oriented 4-point BCC noise, with better visual isotropy in (X, Z).
@@ -220,7 +248,7 @@ __kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimple
 	 * If Z is vertical in world coordinates, call noise3_XZBeforeY(x, Z, y) or use noise3_XYBeforeZ.
 	 * For a time varied animation, call noise3_XZBeforeY(x, T, y) or use noise3_XYBeforeZ.
 	 */
-__kernel void noise3_XZBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
+/*__kernel void noise3_XZBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z){
 
 	// Re-orient the cubic lattices without skewing, to make X and Z triangular like 2D.
 	// Orthonormal rotation. Not a skew transform.
@@ -233,14 +261,14 @@ __kernel void noise3_XZBeforeY(__global OpenSimplexEnv *ose, __global OpenSimple
 
 	// Evaluate both lattices to form a BCC lattice.
 	return _noise3_BCC(ose, osg, xr, yr, zr);
-}
+}*/
 
 /**
 	 * 4D OpenSimplex2F noise base.
 	 * Current implementation not fully optimized by lookup tables.
 	 * But still comes out slightly ahead of Gustavson's Simplex in tests.
 	 */
-double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, double ys, double zs, double ws){
+/*double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, double ys, double zs, double ws){
 	double value = 0;
 
 	// Get base points and offsets
@@ -388,53 +416,53 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 	}
 
 	return value;
-}
+}*/
 
 /**
 	 * 4D OpenSimplex2F noise, classic lattice orientation.
 	 */
-__kernel void noise4_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
+/*__kernel void noise4_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	// Get points for A4 lattice
 	double s = -0.138196601125011 * (x + y + z + w);
 	double xs = x + s, ys = y + s, zs = z + s, ws = w + s;
 
 	return _noise4_Base(ose, osg, xs, ys, zs, ws);
-}
+}*/
 
 /**
 	 * 4D OpenSimplex2F noise, with XY and ZW forming orthogonal triangular-based planes.
 	 * Recommended for 3D terrain, where X and Y (or Z and W) are horizontal.
 	 * Recommended for noise(x, y, sin(time), cos(time)) trick.
 	 */
-__kernel void noise4_XYBeforeZW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
+/*__kernel void noise4_XYBeforeZW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
 	double t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
 	double xs = x + s2, ys = y + s2, zs = z + t2, ws = w + t2;
 
 	return _noise4_Base(ose, osg, xs, ys, zs, ws);
-}
+}*/
 
 /**
 	 * 4D OpenSimplex2F noise, with XZ and YW forming orthogonal triangular-based planes.
 	 * Recommended for 3D terrain, where X and Z (or Y and W) are horizontal.
 	 */
-__kernel void noise4_XZBeforeYW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
+/*__kernel void noise4_XZBeforeYW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
 	double t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
 	double xs = x + s2, ys = y + t2, zs = z + s2, ws = w + t2;
 
 	return _noise4_Base(ose, osg, xs, ys, zs, ws);
-}
+}*/
 
 /**
 	 * 4D OpenSimplex2F noise, with XYZ oriented like noise3_Classic,
 	 * and W for an extra degree of freedom. W repeats eventually.
 	 * Recommended for time-varied animations which texture a 3D object (W=time)
 	 */
-__kernel void noise4_XYZBeforeW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
+/*__kernel void noise4_XYZBeforeW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y, double z, double w){
 
 	double xyz = x + y + z;
 	double ww = w * 0.2236067977499788;
@@ -442,23 +470,4 @@ __kernel void noise4_XYZBeforeW(__global OpenSimplexEnv *ose, __global OpenSimpl
 	double xs = x + s2, ys = y + s2, zs = z + s2, ws = -0.5 * xyz + ww;
 
 	return _noise4_Base(ose, osg, xs, ys, zs, ws);
-}
-
-
-
-
-#define PERIOD 64.0
-#define OFF_X 2048
-#define OFF_Y 2048	
-#define FREQ 1.0 / PERIOD
-
-__kernel void main(const unsigned int size, __global double* output){
-    int x = get_global_id(0);
-    int y = get_global_id(1);
-    int index = y*get_global_size(0) + x;
-    if (index < size){
-        OpenSimplexEnv ose = initOpenSimplex();
-        OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
-        output[index] = noise2(&ose, &osg, (x + OFF_X) * FREQ, (y + OFF_Y) * FREQ);
-    }
-}
+}*/

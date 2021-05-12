@@ -16,6 +16,7 @@
 
 
 
+#pragma pack()
 typedef struct {
     int xsv, ysv;
     double dx, dy;

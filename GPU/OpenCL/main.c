@@ -2,6 +2,7 @@
 #include <CL/cl.h>
 #include "bitmap.h"
 #include <sys/timeb.h>
+#include "OpenSimplex2F.h"
 
 
 
@@ -249,10 +250,10 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      cl_mem device_output_buffer;
      double *output_buffer;
      unsigned int size = width * height;
-     size_t output_buffer_size_in_bytes = size * sizeof(double);
+     size_t output_size = size * sizeof(double);
      size_t num_work_groups[] = {width, height};
      size_t work_group_size[] = {1, 1};
-     output_buffer = (double *)malloc(output_buffer_size_in_bytes);
+     output_buffer = (double *)malloc(output_size);
      char *kernel_source = read_file(kernel_filename);
      cl_int res;
 
@@ -261,14 +262,16 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      program = clCreateProgramWithSource(context, 1, &kernel_source, NULL, &errcode_ret);
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
-     kernel = clCreateKernel(program, "main", &errcode_ret);
+     kernel = clCreateKernel(program, "noise2", &errcode_ret);
      device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
      device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
-     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_buffer_size_in_bytes, NULL, NULL);
+     device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
      //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 
-     clSetKernelArg(kernel, 0, sizeof(unsigned int), &size);
-     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_output_buffer);
+     clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_OpenSimplexEnv_buffer);
+     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_OpenSimplexGradients_buffer);
+     clSetKernelArg(kernel, 2, sizeof(unsigned int), &size);
+     clSetKernelArg(kernel, 3, sizeof(cl_mem), &device_output_buffer);
 
      struct timeb start, end;
 
@@ -280,7 +283,7 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      printf("clFinish() time: %fs\n", get_time_s(start, end));
 
      ftime(&start);
-     clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, output_buffer_size_in_bytes, output_buffer, 0, NULL, NULL);
+     clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, output_size, output_buffer, 0, NULL, NULL);
      //output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
      ftime(&end);
      printf("clEnqueueReadBuffer() time: %fs\n", get_time_s(start, end));
@@ -309,6 +312,6 @@ int main(){
      printf("GPU available memory %llu bytes\n", get_GPU_mem(gpu_device));
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
-     run_kernel(gpu_device, "OpenSimplex2F_noise2.cl", ose, sizeof(ose), osg, sizeof(osg), WIDTH, HEIGHT);
+     run_kernel(gpu_device, "OpenSimplex2F.cl", &ose, sizeof(ose), &osg, sizeof(osg), WIDTH, HEIGHT);
      return 0;
 }
