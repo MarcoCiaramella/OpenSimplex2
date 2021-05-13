@@ -5,14 +5,6 @@
 
 
 
-/*
-	 * Utility
-	 */
-
-cl_int _fastFloor(cl_double x){
-	cl_int xi = (cl_int)x;
-	return x < xi ? xi - 1 : xi;
-}
 
 Grad2 _newGrad2(cl_double dx, cl_double dy){
     Grad2 grad2;
