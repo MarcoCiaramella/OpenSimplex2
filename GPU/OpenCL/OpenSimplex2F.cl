@@ -9,50 +9,50 @@
 
 
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     int xsv, ysv;
     double dx, dy;
 } LatticePoint2D;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     double dxr, dyr, dzr;
     int xrv, yrv, zrv;
 	bool is_null;
 } _LatticePoint3D;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     _LatticePoint3D _this;
     _LatticePoint3D nextOnFailure;
     _LatticePoint3D nextOnSuccess;
 } LatticePoint3D;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     int xsv, ysv, zsv, wsv;
     double dx, dy, dz, dw;
     double xsi, ysi, zsi, wsi;
     double ssiDelta;
 } LatticePoint4D;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     double dx, dy;
 } Grad2;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     double dx, dy, dz;
 } Grad3;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     double dx, dy, dz, dw;
 } Grad4;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     short perm[PSIZE];
     Grad2 permGrad2[PSIZE];
     Grad3 permGrad3[PSIZE];
     Grad4 permGrad4[PSIZE];
 } OpenSimplexGradients;
 
-typedef struct {
+typedef struct __attribute__ ((packed)) {
     Grad2 GRADIENTS_2D[PSIZE];
     Grad3 GRADIENTS_3D[PSIZE];
     Grad4 GRADIENTS_4D[PSIZE];
