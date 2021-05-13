@@ -114,7 +114,6 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 		LatticePoint2D *c = &(ose->LOOKUP_2D[index + i]);
 
 		double dx = xi + c->dx, dy = yi + c->dy;
-		printf("ok\n");
 		double attn = 0.5 - dx * dx - dy * dy;
 		if (attn <= 0)
 			continue;

@@ -9,19 +9,19 @@
 	 * Utility
 	 */
 
-int _fastFloor(double x){
-	int xi = (int)x;
+cl_int _fastFloor(cl_double x){
+	cl_int xi = (cl_int)x;
 	return x < xi ? xi - 1 : xi;
 }
 
-Grad2 _newGrad2(double dx, double dy){
+Grad2 _newGrad2(cl_double dx, cl_double dy){
     Grad2 grad2;
     grad2.dx = dx;
     grad2.dy = dy;
     return grad2;
 }
 
-Grad3 _newGrad3(double dx, double dy, double dz){
+Grad3 _newGrad3(cl_double dx, cl_double dy, cl_double dz){
     Grad3 grad3;
     grad3.dx = dx;
     grad3.dy = dy;
@@ -29,7 +29,7 @@ Grad3 _newGrad3(double dx, double dy, double dz){
     return grad3;
 }
 
-Grad4 _newGrad4(double dx, double dy, double dz, double dw){
+Grad4 _newGrad4(cl_double dx, cl_double dy, cl_double dz, cl_double dw){
     Grad4 grad4;
     grad4.dx = dx;
     grad4.dy = dy;
@@ -40,7 +40,7 @@ Grad4 _newGrad4(double dx, double dy, double dz, double dw){
 
 void _loadGrad2ConstArray(OpenSimplexEnv *ose){
     Grad2 arr[24];
-    int i = 0;
+    cl_int i = 0;
 	arr[i++] = _newGrad2(0.130526192220052, 0.99144486137381);
 	arr[i++] = _newGrad2(0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(0.608761429008721, 0.793353340291235);
@@ -65,18 +65,18 @@ void _loadGrad2ConstArray(OpenSimplexEnv *ose){
 	arr[i++] = _newGrad2(-0.608761429008721, 0.793353340291235);
 	arr[i++] = _newGrad2(-0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(-0.130526192220052, 0.99144486137381);
-    for (int i = 0; i < 24; i++) {
+    for (cl_int i = 0; i < 24; i++) {
         arr[i].dx /= N2;
         arr[i].dy /= N2;
     }
-	for (int i = 0; i < PSIZE; i++) {
+	for (cl_int i = 0; i < PSIZE; i++) {
         ose->GRADIENTS_2D[i] = arr[i % 24];
     }
 }
 
 void _loadGrad3ConstArray(OpenSimplexEnv *ose){
 	Grad3 arr[48];
-	int i = 0;
+	cl_int i = 0;
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, -1.0);
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, 1.0);
 	arr[i++] = _newGrad3(-3.0862664687972017, -1.1721513422464978, 0.0);
@@ -125,19 +125,19 @@ void _loadGrad3ConstArray(OpenSimplexEnv *ose){
 	arr[i++] = _newGrad3(2.22474487139, 2.22474487139, 1.0);
 	arr[i++] = _newGrad3(3.0862664687972017, 1.1721513422464978, 0.0);
 	arr[i++] = _newGrad3(1.1721513422464978, 3.0862664687972017, 0.0);
-	for (int i = 0; i < 48; i++){
+	for (cl_int i = 0; i < 48; i++){
 		arr[i].dx /= N3;
 		arr[i].dy /= N3;
 		arr[i].dz /= N3;
 	}
-	for (int i = 0; i < PSIZE; i++){
+	for (cl_int i = 0; i < PSIZE; i++){
 		ose->GRADIENTS_3D[i] = arr[i % 48];
 	}
 }
 
 void _loadGrad4ConstArray(OpenSimplexEnv *ose){
 	Grad4 arr[160];
-	int i = 0;
+	cl_int i = 0;
 	arr[i++] = _newGrad4(-0.753341017856078, -0.37968289875261624, -0.37968289875261624, -0.37968289875261624);
 	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, -0.4321472685365301, 0.12128480194602098);
 	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, 0.12128480194602098, -0.4321472685365301);
@@ -298,28 +298,28 @@ void _loadGrad4ConstArray(OpenSimplexEnv *ose){
 	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, -0.12128480194602098, 0.4321472685365301);
 	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, 0.4321472685365301, -0.12128480194602098);
 	arr[i++] = _newGrad4(0.753341017856078, 0.37968289875261624, 0.37968289875261624, 0.37968289875261624);
-	for (int i = 0; i < 160; i++){
+	for (cl_int i = 0; i < 160; i++){
 		arr[i].dx /= N4;
 		arr[i].dy /= N4;
 		arr[i].dz /= N4;
 		arr[i].dw /= N4;
 	}
-	for (int i = 0; i < PSIZE; i++){
+	for (cl_int i = 0; i < PSIZE; i++){
 		ose->GRADIENTS_4D[i] = arr[i % 160];
 	}
 }
 
-LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
+LatticePoint2D _newLatticePoint2D(cl_int xsv, cl_int ysv){
 	LatticePoint2D lp2D;
 	lp2D.xsv = xsv;
 	lp2D.ysv = ysv;
-	double ssv = (xsv + ysv) * -0.211324865405187;
+	cl_double ssv = (xsv + ysv) * -0.211324865405187;
 	lp2D.dx = -xsv - ssv;
 	lp2D.dy = -ysv - ssv;
 	return lp2D;
 }
 
-LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
+LatticePoint3D _newLatticePoint3D(cl_int xrv, cl_int yrv, cl_int zrv, cl_int lattice){
 	LatticePoint3D lp3D;
 	lp3D._this.dxr = -xrv + lattice * 0.5;
 	lp3D._this.dyr = -yrv + lattice * 0.5;
@@ -333,13 +333,13 @@ LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
 	return lp3D;
 }
 
-LatticePoint4D _newLatticePoint4D(int xsv, int ysv, int zsv, int wsv){
+LatticePoint4D _newLatticePoint4D(cl_int xsv, cl_int ysv, cl_int zsv, cl_int wsv){
 	LatticePoint4D lp4D;
 	lp4D.xsv = xsv + 409;
 	lp4D.ysv = ysv + 409;
 	lp4D.zsv = zsv + 409;
 	lp4D.wsv = wsv + 409;
-	double ssv = (xsv + ysv + zsv + wsv) * 0.309016994374947;
+	cl_double ssv = (xsv + ysv + zsv + wsv) * 0.309016994374947;
 	lp4D.dx = -xsv - ssv;
 	lp4D.dy = -ysv - ssv;
 	lp4D.dz = -zsv - ssv;
@@ -360,8 +360,8 @@ void _loadLatticePoint2DConstArray(OpenSimplexEnv *ose){
 }
 
 void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
-	for (int i = 0; i < 8; i++){
-		int i1, j1, k1, i2, j2, k2;
+	for (cl_int i = 0; i < 8; i++){
+		cl_int i1, j1, k1, i2, j2, k2;
 		i1 = (i >> 0) & 1;
 		j1 = (i >> 1) & 1;
 		k1 = (i >> 2) & 1;
@@ -407,7 +407,7 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 }
 
 void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
-	for (int i = 0; i < 16; i++) {
+	for (cl_int i = 0; i < 16; i++) {
 		ose->VERTICES_4D[i] = _newLatticePoint4D((i >> 0) & 1, (i >> 1) & 1, (i >> 2) & 1, (i >> 3) & 1);
 	}
 }
@@ -423,15 +423,15 @@ OpenSimplexEnv initOpenSimplex(){
 	return ose;
 }
 
-OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, long seed){
+OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
     OpenSimplexGradients osg;
-    short source[PSIZE];
-    for (short i = 0; i < PSIZE; i++){
+    cl_short source[PSIZE];
+    for (cl_short i = 0; i < PSIZE; i++){
         source[i] = i;
     }
-    for (int i = PSIZE - 1; i >= 0; i--){
+    for (cl_int i = PSIZE - 1; i >= 0; i--){
         seed = seed * 6364136223846793005L + 1442695040888963407L;
-		int r = (int)((seed + 31) % (i + 1));
+		cl_int r = (cl_int)((seed + 31) % (i + 1));
 		if (r < 0){
             r += (i + 1);
         }

@@ -264,8 +264,12 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "noise2", &errcode_ret);
      
-     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
-     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
+     //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
+     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, NULL, NULL);
+     clEnqueueWriteBuffer(queue, device_OpenSimplexEnv_buffer, CL_TRUE, 0, ose_size, &ose, 0, NULL, NULL);
+     //device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
+     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, NULL, NULL);
+     clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, osg_size, &osg, 0, NULL, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
      //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 

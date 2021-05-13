@@ -1,4 +1,4 @@
-#include <stdbool.h>
+#include <CL/cl.h>
 
 
 #define PSIZE 2048
@@ -16,16 +16,16 @@
 
 
 
-#pragma pack()
+//#pragma pack()
 typedef struct {
-    int xsv, ysv;
-    double dx, dy;
+    cl_int xsv, ysv;
+    cl_double dx, dy;
 } LatticePoint2D;
 
 typedef struct {
-    double dxr, dyr, dzr;
-    int xrv, yrv, zrv;
-	bool is_null;
+    cl_double dxr, dyr, dzr;
+    cl_int xrv, yrv, zrv;
+	cl_bool is_null;
 } _LatticePoint3D;
 
 typedef struct {
@@ -35,26 +35,26 @@ typedef struct {
 } LatticePoint3D;
 
 typedef struct {
-    int xsv, ysv, zsv, wsv;
-    double dx, dy, dz, dw;
-    double xsi, ysi, zsi, wsi;
-    double ssiDelta;
+    cl_int xsv, ysv, zsv, wsv;
+    cl_double dx, dy, dz, dw;
+    cl_double xsi, ysi, zsi, wsi;
+    cl_double ssiDelta;
 } LatticePoint4D;
 
 typedef struct {
-    double dx, dy;
+    cl_double dx, dy;
 } Grad2;
 
 typedef struct {
-    double dx, dy, dz;
+    cl_double dx, dy, dz;
 } Grad3;
 
 typedef struct {
-    double dx, dy, dz, dw;
+    cl_double dx, dy, dz, dw;
 } Grad4;
 
 typedef struct {
-    short perm[PSIZE];
+    cl_short perm[PSIZE];
     Grad2 permGrad2[PSIZE];
     Grad3 permGrad3[PSIZE];
     Grad4 permGrad4[PSIZE];
@@ -71,4 +71,4 @@ typedef struct {
 
 
 OpenSimplexEnv initOpenSimplex();
-OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, long seed);
+OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
