@@ -263,6 +263,7 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "noise2", &errcode_ret);
+     
      device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
      device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
@@ -297,6 +298,8 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
           print_error(res);
      }
 
+     clReleaseMemObject(device_OpenSimplexEnv_buffer);
+     clReleaseMemObject(device_OpenSimplexGradients_buffer);
      clReleaseMemObject(device_output_buffer);
      clReleaseProgram(program);
      clReleaseKernel(kernel);
