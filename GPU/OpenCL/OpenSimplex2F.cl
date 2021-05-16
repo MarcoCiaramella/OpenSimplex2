@@ -132,7 +132,6 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 /**
 	 * 2D Simplex noise, standard lattice orientation.
 	 */
-//__kernel void noise2(__global __attribute__ ((endian(host))) OpenSimplexEnv *ose, __global __attribute__ ((endian(host))) OpenSimplexGradients *osg, __attribute__ ((endian(host))) const unsigned int size, __attribute__ ((endian(host))) __global double* output){
 __kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int size, __global double* output){
 
 	int index = get_index();
