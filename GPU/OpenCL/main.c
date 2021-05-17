@@ -3,6 +3,8 @@
 #include "bitmap.h"
 #include <sys/timeb.h>
 #include "OpenSimplex2F.h"
+#include <math.h>
+
 
 
 
@@ -239,6 +241,12 @@ void print_build_log_failure(cl_int res, cl_device_id gpu_device, cl_program pro
      }
 }
 
+cl_uint get_num_compute_units(cl_device_id device){
+     cl_uint num_compute_units;
+     clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(cl_uint), &num_compute_units, NULL);
+     return num_compute_units;
+}
+
 void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, int width, int height){
      cl_context context;
      cl_command_queue queue;
@@ -251,8 +259,10 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      double *output_buffer;
      unsigned int size = width * height;
      size_t output_size = size * sizeof(double);
-     size_t num_work_groups[] = {width, height};
-     size_t work_group_size[] = {1, 1};
+     cl_uint num_compute_units = get_num_compute_units(gpu_device);
+     cl_uint n = (cl_uint) sqrt(num_compute_units);
+     size_t num_work_groups[] = {n, n};
+     size_t work_group_size[] = {ceil(width/(cl_double)n), ceil(width/(cl_double)n)};
      output_buffer = (double *)malloc(output_size);
      char *kernel_source = read_file(kernel_filename);
      cl_int res;
