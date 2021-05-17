@@ -6,8 +6,8 @@
 
 
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 5120
+#define HEIGHT 5120
 
 
 
@@ -239,7 +239,7 @@ void print_build_log_failure(cl_int res, cl_device_id gpu_device, cl_program pro
      }
 }
 
-void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *ose, size_t ose_size, OpenSimplexGradients *osg, size_t osg_size, int width, int height){
+void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, int width, int height){
      cl_context context;
      cl_command_queue queue;
      cl_program program;
@@ -264,12 +264,12 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "noise2", &errcode_ret);
      
-     //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, ose, NULL);
-     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, ose_size, NULL, NULL);
-     clEnqueueWriteBuffer(queue, device_OpenSimplexEnv_buffer, CL_TRUE, 0, ose_size, &ose, 0, NULL, NULL);
-     //device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, osg, NULL);
-     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, osg_size, NULL, NULL);
-     clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, osg_size, &osg, 0, NULL, NULL);
+     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexEnv), ose, NULL);
+     //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
+     //clEnqueueWriteBuffer(queue, device_OpenSimplexEnv_buffer, CL_TRUE, 0, sizeof(OpenSimplexEnv), &ose, 0, NULL, NULL);
+     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexGradients), osg, NULL);
+     //device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexGradients), NULL, NULL);
+     //clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, sizeof(OpenSimplexGradients), &osg, 0, NULL, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
      //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
 
@@ -285,7 +285,7 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      print_error(res);
      clFinish(queue);
      ftime(&end);
-     printf("clFinish() time: %fs\n", get_time_s(start, end));
+     printf("kernel time: %fs\n", get_time_s(start, end));
 
      ftime(&start);
      clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, output_size, output_buffer, 0, NULL, NULL);
@@ -319,6 +319,6 @@ int main(){
      printf("GPU available memory %llu bytes\n", get_GPU_mem(gpu_device));
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
-     run_kernel(gpu_device, "OpenSimplex2F.cl", &ose, sizeof(ose), &osg, sizeof(osg), WIDTH, HEIGHT);
+     run_kernel(gpu_device, "OpenSimplex2F.cl", &ose, &osg, WIDTH, HEIGHT);
      return 0;
 }
