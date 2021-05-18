@@ -8,8 +8,8 @@
 
 
 
-#define WIDTH 5120
-#define HEIGHT 5120
+#define WIDTH 512
+#define HEIGHT 512
 
 
 
@@ -247,6 +247,12 @@ cl_uint get_num_compute_units(cl_device_id device){
      return num_compute_units;
 }
 
+size_t get_work_group_size(cl_kernel kernel, cl_device_id device){
+     size_t work_group_size;
+     clGetKernelWorkGroupInfo(kernel, device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(size_t), &work_group_size, NULL);
+     return work_group_size;
+}
+
 void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, int width, int height){
      cl_context context;
      cl_command_queue queue;
@@ -260,9 +266,6 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      unsigned int size = width * height;
      size_t output_size = size * sizeof(double);
      cl_uint num_compute_units = get_num_compute_units(gpu_device);
-     cl_uint n = (cl_uint) sqrt(num_compute_units);
-     size_t num_work_groups[] = {n, n};
-     size_t work_group_size[] = {ceil(width/(cl_double)n), ceil(width/(cl_double)n)};
      output_buffer = (double *)malloc(output_size);
      char *kernel_source = read_file(kernel_filename);
      cl_int res;
@@ -273,6 +276,11 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, gpu_device, program);
      kernel = clCreateKernel(program, "noise2", &errcode_ret);
+
+     size_t work_group_size = get_work_group_size(kernel, gpu_device);
+     cl_uint n = (cl_uint) sqrt(num_compute_units);
+     size_t work_group_size_xy[] = {sqrt(work_group_size), sqrt(work_group_size)};
+     size_t num_work_groups_xy[] = {ceil(width/(cl_double)work_group_size_xy[0]), ceil(height/(cl_double)work_group_size_xy[1])};
      
      device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexEnv), ose, NULL);
      //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
@@ -291,7 +299,7 @@ void run_kernel(cl_device_id gpu_device, char *kernel_filename, OpenSimplexEnv *
      struct timeb start, end;
 
      ftime(&start);
-     res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, num_work_groups, work_group_size, 0, NULL, NULL);
+     res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, num_work_groups_xy, work_group_size_xy, 0, NULL, NULL);
      print_error(res);
      clFinish(queue);
      ftime(&end);
