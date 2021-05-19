@@ -135,3 +135,16 @@ int main(){
     return 0;
 }
 ```
+
+## Performance
+
+Image 4096x4096 on CPU Intel Core i5-4460 3.20GHz
+
+noise2 1.768000s
+noise2_XBeforeY 1.753000s
+noise3_Classic 2.143000s
+noise3_XYBeforeZ 2.116000s
+noise3_XZBeforeY 2.170000s
+noise4_Classic 3.150000s
+noise4_XYBeforeZW 3.843000s
+noise4_XZBeforeYW 3.608000s
