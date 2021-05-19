@@ -63,10 +63,13 @@ typedef struct __attribute__ ((packed)) {
 
 
 
-int get_index(){
+int get_index(const unsigned int width, const unsigned int height){
 	int x = get_global_id(0);
 	int y = get_global_id(1);
-	return y*get_global_size(0) + x;
+	if (x < width && y < height){
+		return y*width + x;
+	}
+	return -1;
 }
 
 double get_x(){
@@ -132,10 +135,10 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 /**
 	 * 2D Simplex noise, standard lattice orientation.
 	 */
-__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int size, __global double* output){
+__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
 
-	int index = get_index();
-    if (index < size){
+	int index = get_index(width, height);
+    if (index >= 0){
 
 		double x = get_x();
 		double y = get_y();

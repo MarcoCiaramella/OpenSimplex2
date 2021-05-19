@@ -11,8 +11,8 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 
-#define WIDTH 5120
-#define HEIGHT 5120
+#define WIDTH 665
+#define HEIGHT 665
 
 
 
@@ -273,12 +273,19 @@ size_t* get_local_work_size(cl_kernel kernel, cl_device_id device){
      size_t* max_num_work_item = get_max_num_work_item(device, get_num_dimensions(device));
      size_t work_group_size = get_work_group_size(kernel, device);
      size_t* local_work_size = (size_t*) malloc(sizeof(size_t) * 2);
-     local_work_size[0] = MIN(sqrt(work_group_size), max_num_work_item[0]);
-     local_work_size[1] = MIN(sqrt(work_group_size), max_num_work_item[1]);
+     local_work_size[0] = MIN(floor(sqrt(work_group_size)), max_num_work_item[0]);
+     local_work_size[1] = MIN(floor(sqrt(work_group_size)), max_num_work_item[1]);
      return local_work_size;
 }
 
-void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, int width, int height){
+size_t* get_global_work_size(size_t* local_work_size, int width, int height){
+     size_t* global_work_size = (size_t*) malloc(sizeof(size_t) * 2);
+     global_work_size[0] = ceil(width/(cl_double)local_work_size[0]) * local_work_size[0];
+     global_work_size[1] = ceil(height/(cl_double)local_work_size[1]) * local_work_size[1];
+     return global_work_size;
+}
+
+void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, unsigned int width, unsigned int height){
      cl_context context;
      cl_command_queue queue;
      cl_program program;
@@ -288,8 +295,7 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      cl_mem device_OpenSimplexGradients_buffer;
      cl_mem device_output_buffer;
      double *output_buffer;
-     unsigned int size = width * height;
-     size_t output_size = size * sizeof(double);
+     size_t output_size = width * height * sizeof(double);
      cl_uint num_compute_units = get_num_compute_units(device);
      output_buffer = (double *)malloc(output_size);
      char *kernel_source = read_file(kernel_filename);
@@ -300,10 +306,7 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      program = clCreateProgramWithSource(context, 1, &kernel_source, NULL, &errcode_ret);
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, device, program);
-     kernel = clCreateKernel(program, "noise2", &errcode_ret);
-     
-     size_t global_work_size[] = {width, height};
-     
+     kernel = clCreateKernel(program, "noise2", &errcode_ret);     
      
      device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexEnv), ose, NULL);
      //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
@@ -316,13 +319,17 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
 
      clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_OpenSimplexEnv_buffer);
      clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_OpenSimplexGradients_buffer);
-     clSetKernelArg(kernel, 2, sizeof(unsigned int), &size);
-     clSetKernelArg(kernel, 3, sizeof(cl_mem), &device_output_buffer);
+     clSetKernelArg(kernel, 2, sizeof(unsigned int), &width);
+     clSetKernelArg(kernel, 3, sizeof(unsigned int), &height);
+     clSetKernelArg(kernel, 4, sizeof(cl_mem), &device_output_buffer);
 
      struct timeb start, end;
 
+     size_t* local_work_size = get_local_work_size(kernel, device);
+     size_t* global_work_size = get_global_work_size(local_work_size, width, height);
+
      ftime(&start);
-     res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, global_work_size, get_local_work_size(kernel, device), 0, NULL, NULL);
+     res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
      print_error(res);
      clFinish(queue);
      ftime(&end);
@@ -357,7 +364,6 @@ int main(){
      cl_device_id device;
      get_GPU_platform(&gpu_platform);
      get_GPU_device(gpu_platform, &device);
-     printf("GPU available memory %llu bytes\n", get_GPU_mem(device));
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
      run_kernel(device, "OpenSimplex2F.cl", &ose, &osg, WIDTH, HEIGHT);
