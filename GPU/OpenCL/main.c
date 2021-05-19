@@ -11,8 +11,8 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 
-#define WIDTH 665
-#define HEIGHT 665
+#define WIDTH 4096
+#define HEIGHT 4096
 
 
 
@@ -285,7 +285,8 @@ size_t* get_global_work_size(size_t* local_work_size, int width, int height){
      return global_work_size;
 }
 
-void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose, OpenSimplexGradients *osg, unsigned int width, unsigned int height){
+double* run_kernel(char *kernel_filename, char *function, OpenSimplexEnv *ose, OpenSimplexGradients *osg, unsigned int width, unsigned int height){
+     
      cl_context context;
      cl_command_queue queue;
      cl_program program;
@@ -294,19 +295,31 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      cl_mem device_OpenSimplexEnv_buffer;
      cl_mem device_OpenSimplexGradients_buffer;
      cl_mem device_output_buffer;
+     size_t output_size;
      double *output_buffer;
-     size_t output_size = width * height * sizeof(double);
-     cl_uint num_compute_units = get_num_compute_units(device);
-     output_buffer = (double *)malloc(output_size);
-     char *kernel_source = read_file(kernel_filename);
+     cl_uint num_compute_units;
+     char *kernel_source;
      cl_int res;
+     struct timeb start, end;
+     cl_platform_id gpu_platform;
+     cl_device_id device;
+
+     ftime(&start);
+
+     get_GPU_platform(&gpu_platform);
+     get_GPU_device(gpu_platform, &device);
+
+     output_size = width * height * sizeof(double);
+     output_buffer = (double *)malloc(output_size);
+     num_compute_units = get_num_compute_units(device);
+     kernel_source = read_file(kernel_filename);     
 
      context = clCreateContext(0, 1, &device, NULL, NULL, &errcode_ret);
      queue = clCreateCommandQueue(context, device, 0, &errcode_ret);
      program = clCreateProgramWithSource(context, 1, &kernel_source, NULL, &errcode_ret);
      res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
      print_build_log_failure(res, device, program);
-     kernel = clCreateKernel(program, "noise2", &errcode_ret);     
+     kernel = clCreateKernel(program, function, &errcode_ret);     
      
      device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexEnv), ose, NULL);
      //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
@@ -315,7 +328,7 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      //device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexGradients), NULL, NULL);
      //clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, sizeof(OpenSimplexGradients), &osg, 0, NULL, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
-     //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, buffer_size_in_bytes, output_buffer, NULL);
+     //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, output_size, output_buffer, NULL);
 
      clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_OpenSimplexEnv_buffer);
      clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_OpenSimplexGradients_buffer);
@@ -323,32 +336,20 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      clSetKernelArg(kernel, 3, sizeof(unsigned int), &height);
      clSetKernelArg(kernel, 4, sizeof(cl_mem), &device_output_buffer);
 
-     struct timeb start, end;
-
      size_t* local_work_size = get_local_work_size(kernel, device);
      size_t* global_work_size = get_global_work_size(local_work_size, width, height);
 
-     ftime(&start);
+     
      res = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
      print_error(res);
      clFinish(queue);
-     ftime(&end);
-     printf("kernel time: %fs\n", get_time_s(start, end));
-
-     ftime(&start);
+     
      clEnqueueReadBuffer(queue, device_output_buffer, CL_TRUE, 0, output_size, output_buffer, 0, NULL, NULL);
-     //output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, buffer_size_in_bytes, 0, NULL, NULL, &res);
-     ftime(&end);
-     printf("clEnqueueReadBuffer() time: %fs\n", get_time_s(start, end));
-     //printf("clEnqueueMapBuffer() time: %fs\n", get_time_s(start, end));
+     //output_buffer = (double *) clEnqueueMapBuffer(queue, device_output_buffer, CL_TRUE, CL_MAP_READ, 0, output_size, 0, NULL, NULL, &res);
 
-     if (output_buffer != NULL){
-          save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, output_buffer);
-          //free(output_buffer);
-     }
-     else {
+     /*if (output_buffer == NULL){
           print_error(res);
-     }
+     }*/
 
      clReleaseMemObject(device_OpenSimplexEnv_buffer);
      clReleaseMemObject(device_OpenSimplexGradients_buffer);
@@ -357,15 +358,62 @@ void run_kernel(cl_device_id device, char *kernel_filename, OpenSimplexEnv *ose,
      clReleaseKernel(kernel);
      clReleaseCommandQueue(queue);
      clReleaseContext(context);
+
+     ftime(&end);
+     printf("time %s: %fs\n", function, get_time_s(start, end));
+
+     return output_buffer;
+}
+
+double* generate_noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise2", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise2_XBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise2_XBeforeY", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise3_Classic", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise3_XYBeforeZ", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise3_XZBeforeY", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise4_Classic", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise4_XYBeforeZW", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise4_XZBeforeYW", ose, osg, WIDTH, HEIGHT);
+}
+
+double* generate_noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+     return run_kernel("OpenSimplex2F.cl", "noise4_XYZBeforeW", ose, osg, WIDTH, HEIGHT);
 }
 
 int main(){
-     cl_platform_id gpu_platform;
-     cl_device_id device;
-     get_GPU_platform(&gpu_platform);
-     get_GPU_device(gpu_platform, &device);
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
-     run_kernel(device, "OpenSimplex2F.cl", &ose, &osg, WIDTH, HEIGHT);
+
+     save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
+
+     save_bitmap("img/noise2_XBeforeY.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(&ose, &osg));
+     save_bitmap("img/noise3_Classic.bmp", WIDTH, HEIGHT, generate_noise3_Classic(&ose, &osg));
+     save_bitmap("img/noise3_XYBeforeZ.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(&ose, &osg));
+     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));
+     save_bitmap("img/noise4_Classic.bmp", WIDTH, HEIGHT, generate_noise4_Classic(&ose, &osg));
+     save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
+     save_bitmap("img/noise4_XZBeforeYW.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(&ose, &osg));
+     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));
      return 0;
 }

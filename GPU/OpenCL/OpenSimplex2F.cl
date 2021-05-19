@@ -155,14 +155,17 @@ __kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients
 	 * Might be better for a 2D sandbox style game, where Y is vertical.
 	 * Probably slightly less optimal for heightmaps or continent maps.
 	 */
-/*__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, double x, double y){
+__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
 
-	// Skew transform and rotation baked into one.
-	double xx = x * 0.7071067811865476;
-	double yy = y * 1.224744871380249;
+	int index = get_index(width, height);
+    if (index >= 0){
+		// Skew transform and rotation baked into one.
+		double xx = x * 0.7071067811865476;
+		double yy = y * 1.224744871380249;
 
-	return _noise2_Base(ose, osg, yy + xx, yy - xx);
-}*/
+		output[index] = _noise2_Base(ose, osg, yy + xx, yy - xx);
+	}
+}
 
 /**
 	 * Generate overlapping cubic lattices for 3D Re-oriented BCC noise.
