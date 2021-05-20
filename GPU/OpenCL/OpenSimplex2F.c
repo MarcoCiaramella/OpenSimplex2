@@ -376,8 +376,10 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 		LatticePoint3D c7 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
 
 		// First two are guaranteed.
-		c0.nextOnFailure = c0.nextOnSuccess = c1._this;
-		c1.nextOnFailure = c1.nextOnSuccess = c2._this;
+		c0.nextOnFailure = c1._this;
+		c0.nextOnSuccess = c1._this;
+		c1.nextOnFailure = c2._this;
+		c1.nextOnSuccess = c2._this;
 
 		// Once we find one on the first half-lattice, the rest are out.
 		// In addition, knowing c2 rules out c5.
@@ -385,14 +387,16 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 		c2.nextOnSuccess = c6._this;
 		c3.nextOnFailure = c4._this;
 		c3.nextOnSuccess = c5._this;
-		c4.nextOnFailure = c4.nextOnSuccess = c5._this;
+		c4.nextOnFailure = c5._this;
+		c4.nextOnSuccess = c5._this;
 
 		// Once we find one on the second half-lattice, the rest are out.
 		c5.nextOnFailure = c6._this;
 		c5.nextOnSuccess.is_null = true;
 		c6.nextOnFailure = c7._this;
 		c6.nextOnSuccess.is_null = true;
-		c7.nextOnFailure.is_null = c7.nextOnSuccess.is_null = true;
+		c7.nextOnFailure.is_null = true;
+		c7.nextOnSuccess.is_null = true;
 
 		ose->LOOKUP_3D[i] = c0;
 	}
