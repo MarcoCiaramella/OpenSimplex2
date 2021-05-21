@@ -11,8 +11,8 @@
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 4096
+#define HEIGHT 4096
 
 
 

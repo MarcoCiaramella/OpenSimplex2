@@ -6,8 +6,8 @@
 
 
 
-#define WIDTH 4096
-#define HEIGHT 4096
+#define WIDTH 2
+#define HEIGHT 2
 #define PERIOD 64.0
 #define OFF_X 2048
 #define OFF_Y 2048	
@@ -281,14 +281,14 @@ int main(){
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
     //generate_testing_images(ose, osg);
-    test_noise2(ose, osg);
-    test_noise2_XBeforeY(ose, osg);
-    test_noise3_Classic(ose, osg);
-    test_noise3_XYBeforeZ(ose, osg);
-    test_noise3_XZBeforeY(ose, osg);
+    //test_noise2(ose, osg);
+    //test_noise2_XBeforeY(ose, osg);
+    //test_noise3_Classic(ose, osg);
+    //test_noise3_XYBeforeZ(ose, osg);
+    //test_noise3_XZBeforeY(ose, osg);
     test_noise4_Classic(ose, osg);
-    test_noise4_XYBeforeZW(ose, osg);
-    test_noise4_XZBeforeYW(ose, osg);
-    test_noise4_XYZBeforeW(ose, osg);
+    //test_noise4_XYBeforeZW(ose, osg);
+    //test_noise4_XZBeforeYW(ose, osg);
+    //test_noise4_XYZBeforeW(ose, osg);
     return 0;
 }
