@@ -29,16 +29,11 @@ typedef struct {
     cl_double dxr;
     cl_double dyr;
     cl_double dzr;
-    cl_int xrv;
+    cl_int xrv; 
     cl_int yrv;
     cl_int zrv;
-	cl_bool is_null;
-} _LatticePoint3D;
-
-typedef struct {
-    _LatticePoint3D _this;
-    _LatticePoint3D nextOnFailure;
-    _LatticePoint3D nextOnSuccess;
+    cl_int nextOnFailure;
+    cl_int nextOnSuccess;
 } LatticePoint3D;
 
 typedef struct {
@@ -87,7 +82,7 @@ typedef struct {
     Grad3 GRADIENTS_3D[PSIZE];
     Grad4 GRADIENTS_4D[PSIZE];
     LatticePoint2D LOOKUP_2D[4];
-    LatticePoint3D LOOKUP_3D[8];
+    LatticePoint3D LOOKUP_3D[64];
     LatticePoint4D VERTICES_4D[16];
 } OpenSimplexEnv;
 

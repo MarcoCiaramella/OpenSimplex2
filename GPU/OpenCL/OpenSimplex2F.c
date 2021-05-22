@@ -313,15 +313,14 @@ LatticePoint2D _newLatticePoint2D(cl_int xsv, cl_int ysv){
 
 LatticePoint3D _newLatticePoint3D(cl_int xrv, cl_int yrv, cl_int zrv, cl_int lattice){
 	LatticePoint3D lp3D;
-	lp3D._this.dxr = -xrv + lattice * 0.5;
-	lp3D._this.dyr = -yrv + lattice * 0.5;
-	lp3D._this.dzr = -zrv + lattice * 0.5;
-	lp3D._this.xrv = xrv + lattice * 1024;
-	lp3D._this.yrv = yrv + lattice * 1024;
-	lp3D._this.zrv = zrv + lattice * 1024;
-	lp3D._this.is_null = false;
-	lp3D.nextOnFailure.is_null = false;
-	lp3D.nextOnSuccess.is_null = false;
+	lp3D.dxr = -xrv + lattice * 0.5;
+	lp3D.dyr = -yrv + lattice * 0.5;
+	lp3D.dzr = -zrv + lattice * 0.5;
+	lp3D.xrv = xrv + lattice * 1024;
+	lp3D.yrv = yrv + lattice * 1024;
+	lp3D.zrv = zrv + lattice * 1024;
+	lp3D.nextOnFailure = -1;
+	lp3D.nextOnSuccess = -1;
 	return lp3D;
 }
 
@@ -376,27 +375,23 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 		LatticePoint3D c7 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
 
 		// First two are guaranteed.
-		c0.nextOnFailure = c1._this;
-		c0.nextOnSuccess = c1._this;
-		c1.nextOnFailure = c2._this;
-		c1.nextOnSuccess = c2._this;
+		c0.nextOnFailure = c0.nextOnSuccess = i+1;
+		c1.nextOnFailure = c1.nextOnSuccess = i+2;
 
 		// Once we find one on the first half-lattice, the rest are out.
 		// In addition, knowing c2 rules out c5.
-		c2.nextOnFailure = c3._this;
-		c2.nextOnSuccess = c6._this;
-		c3.nextOnFailure = c4._this;
-		c3.nextOnSuccess = c5._this;
-		c4.nextOnFailure = c5._this;
-		c4.nextOnSuccess = c5._this;
+		c2.nextOnFailure = i+3;
+		c2.nextOnSuccess = i+6;
+		c3.nextOnFailure = i+4;
+		c3.nextOnSuccess = i+5;
+		c4.nextOnFailure = c4.nextOnSuccess = i+5;
 
 		// Once we find one on the second half-lattice, the rest are out.
-		c5.nextOnFailure = c6._this;
-		c5.nextOnSuccess.is_null = true;
-		c6.nextOnFailure = c7._this;
-		c6.nextOnSuccess.is_null = true;
-		c7.nextOnFailure.is_null = true;
-		c7.nextOnSuccess.is_null = true;
+		c5.nextOnFailure = i+6;
+		c5.nextOnSuccess = -1;
+		c6.nextOnFailure = i+7;
+		c6.nextOnSuccess = -1;
+		c7.nextOnFailure = c7.nextOnSuccess = -1;
 
 		ose->LOOKUP_3D[i] = c0;
 	}

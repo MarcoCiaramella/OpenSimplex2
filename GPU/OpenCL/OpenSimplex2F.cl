@@ -17,13 +17,8 @@ typedef struct {
 typedef struct {
     double dxr, dyr, dzr;
     int xrv, yrv, zrv;
-	bool is_null;
-} _LatticePoint3D;
-
-typedef struct {
-    _LatticePoint3D _this;
-    _LatticePoint3D nextOnFailure;
-    _LatticePoint3D nextOnSuccess;
+    int nextOnFailure;
+    int nextOnSuccess;
 } LatticePoint3D;
 
 typedef struct {
@@ -173,12 +168,17 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 	// Point contributions
 	double value = 0;
-	_LatticePoint3D *c = &(ose->LOOKUP_3D[index]._this);
-	while (!c->is_null){
+	LatticePoint3D *c = &(ose->LOOKUP_3D[index]);
+	while (c != NULL){
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
-			c = &(ose->LOOKUP_3D[index].nextOnFailure);
+			if (ose->LOOKUP_3D[index].nextOnFailure > -1){
+				c = &(ose->LOOKUP_3D[ose->LOOKUP_3D[index].nextOnFailure]);
+			}
+			else {
+				c = NULL;
+			}
 		}
 		else{
 			int pxm = (xrb + c->xrv) & PMASK, pym = (yrb + c->yrv) & PMASK, pzm = (zrb + c->zrv) & PMASK;
@@ -187,7 +187,12 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 			attn *= attn;
 			value += attn * attn * extrapolation;
-			c = &(ose->LOOKUP_3D[index].nextOnSuccess);
+			if (ose->LOOKUP_3D[index].nextOnSuccess > -1){
+				c = &(ose->LOOKUP_3D[ose->LOOKUP_3D[index].nextOnSuccess]);
+			}
+			else {
+				c = NULL;
+			}
 		}
 	}
 	return value;
