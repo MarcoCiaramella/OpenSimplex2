@@ -379,6 +379,7 @@ LatticePoint4D *_newLatticePoint4D(int xsv, int ysv, int zsv, int wsv){
 	plp4D->zsi = 0.2 - zsv;
 	plp4D->wsi = 0.2 - wsv;
 	plp4D->ssiDelta = (0.8 - xsv - ysv - zsv - wsv) * 0.309016994374947;
+	printf("xsi %f\n",plp4D->xsi);
 	return plp4D;
 }
 
