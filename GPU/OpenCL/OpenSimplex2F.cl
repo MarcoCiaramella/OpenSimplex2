@@ -40,21 +40,6 @@ typedef struct {
     double dx, dy, dz, dw;
 } Grad4;
 
-typedef struct {
-    short perm[PSIZE];
-    Grad2 permGrad2[PSIZE];
-    Grad3 permGrad3[PSIZE];
-    Grad4 permGrad4[PSIZE];
-} OpenSimplexGradients;
-
-typedef struct {
-    Grad2 GRADIENTS_2D[PSIZE];
-    Grad3 GRADIENTS_3D[PSIZE];
-    Grad4 GRADIENTS_4D[PSIZE];
-    LatticePoint2D LOOKUP_2D[4];
-    LatticePoint3D LOOKUP_3D[8];
-    LatticePoint4D VERTICES_4D[16];
-} OpenSimplexEnv;
 
 
 
@@ -90,7 +75,7 @@ int fast_floor(double x){
 	return x < xi ? xi - 1 : xi;
 }
 
-double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, double ys){
+double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, double xs, double ys){
 	double value = 0;
 
 	// Get base points and offsets
@@ -105,7 +90,7 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 
 	// Point contributions
 	for (int i = 0; i < 3; i++){
-		LatticePoint2D *c = &(ose->LOOKUP_2D[index + i]);
+		LatticePoint2D *c = &(LOOKUP_2D[index + i]);
 
 		double dx = xi + c->dx, dy = yi + c->dy;
 		double attn = 0.5 - dx * dx - dy * dy;
@@ -113,7 +98,7 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 			continue;
 
 		int pxm = (xsb + c->xsv) & PMASK, pym = (ysb + c->ysv) & PMASK;
-		Grad2 grad = osg->permGrad2[osg->perm[pxm] ^ pym];
+		Grad2 grad = permGrad2[perm[pxm] ^ pym];
 		double extrapolation = grad.dx * dx + grad.dy * dy;
 
 		attn *= attn;
@@ -123,7 +108,13 @@ double _noise2_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 	return value;
 }
 
-__kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise2(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global LatticePoint2D* LOOKUP_2D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -135,11 +126,17 @@ __kernel void noise2(__global OpenSimplexEnv *ose, __global OpenSimplexGradients
 		double s = 0.366025403784439 * (x + y);
 		double xs = x + s, ys = y + s;
 
-		output[index] = _noise2_Base(ose, osg, xs, ys);
+		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, xs, ys);
 	}
 }
 
-__kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise2_XBeforeY(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global LatticePoint2D* LOOKUP_2D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -151,7 +148,7 @@ __kernel void noise2_XBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplex
 		double xx = x * 0.7071067811865476;
 		double yy = y * 1.224744871380249;
 
-		output[index] = _noise2_Base(ose, osg, yy + xx, yy - xx);
+		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, yy + xx, yy - xx);
 	}
 }
 
@@ -188,7 +185,20 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 	return value;
 }
 
-__kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise3_Classic(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -208,7 +218,20 @@ __kernel void noise3_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexG
 	}
 }
 
-__kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise3_XYBeforeZ(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -230,7 +253,20 @@ __kernel void noise3_XYBeforeZ(__global OpenSimplexEnv *ose, __global OpenSimple
 	}
 }
 
-__kernel void noise3_XZBeforeY(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise3_XZBeforeY(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -403,7 +439,20 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 	return value;
 }
 
-__kernel void noise4_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise4_Classic(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -421,7 +470,20 @@ __kernel void noise4_Classic(__global OpenSimplexEnv *ose, __global OpenSimplexG
 	}
 }
 
-__kernel void noise4_XYBeforeZW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise4_XYBeforeZW(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -439,7 +501,20 @@ __kernel void noise4_XYBeforeZW(__global OpenSimplexEnv *ose, __global OpenSimpl
 	}
 }
 
-__kernel void noise4_XZBeforeYW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise4_XZBeforeYW(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
@@ -457,7 +532,20 @@ __kernel void noise4_XZBeforeYW(__global OpenSimplexEnv *ose, __global OpenSimpl
 	}
 }
 
-__kernel void noise4_XYZBeforeW(__global OpenSimplexEnv *ose, __global OpenSimplexGradients *osg, const unsigned int width, const unsigned int height, __global double* output){
+__kernel void noise4_XYZBeforeW(
+	__global short* perm;
+    __global Grad2* permGrad2;
+    __global Grad3* permGrad3;
+    __global Grad4* permGrad4;
+    __global Grad2* GRADIENTS_2D;
+    __global Grad3* GRADIENTS_3D;
+    __global Grad4* GRADIENTS_4D;
+    __global LatticePoint2D* LOOKUP_2D;
+    __global LatticePoint3D* LOOKUP_3D;
+    __global LatticePoint4D* VERTICES_4D;
+	const unsigned int width,
+	const unsigned int height,
+	__global double* output){
 
 	int index = get_index(width, height);
     if (index >= 0){
