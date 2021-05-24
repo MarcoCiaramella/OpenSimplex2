@@ -405,14 +405,14 @@ int main(){
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
 
-     save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
+     /*save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
      save_bitmap("img/noise2_XBeforeY.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(&ose, &osg));
      save_bitmap("img/noise3_Classic.bmp", WIDTH, HEIGHT, generate_noise3_Classic(&ose, &osg));
      save_bitmap("img/noise3_XYBeforeZ.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(&ose, &osg));
-     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));
+     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));*/
      save_bitmap("img/noise4_Classic.bmp", WIDTH, HEIGHT, generate_noise4_Classic(&ose, &osg));
-     save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
+     /*save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
      save_bitmap("img/noise4_XZBeforeYW.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(&ose, &osg));
-     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));
+     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));*/
      return 0;
 }
