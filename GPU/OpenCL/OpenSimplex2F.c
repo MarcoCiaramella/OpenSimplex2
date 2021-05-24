@@ -351,6 +351,7 @@ void _loadLatticePoint2DConstArray(OpenSimplexEnv *ose){
 }
 
 void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
+	int j = 7;
 	for (cl_int i = 0; i < 8; i++){
 		cl_int i1, j1, k1, i2, j2, k2;
 		i1 = (i >> 0) & 1;
@@ -375,25 +376,32 @@ void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 		LatticePoint3D c7 = _newLatticePoint3D(i1 + i2, j1 + j2, k1 + (k2 ^ 1), 1);
 
 		// First two are guaranteed.
-		c0.nextOnFailure = c0.nextOnSuccess = i+1;
-		c1.nextOnFailure = c1.nextOnSuccess = i+2;
+		c0.nextOnFailure = c0.nextOnSuccess = j+1;
+		c1.nextOnFailure = c1.nextOnSuccess = j+2;
 
 		// Once we find one on the first half-lattice, the rest are out.
 		// In addition, knowing c2 rules out c5.
-		c2.nextOnFailure = i+3;
-		c2.nextOnSuccess = i+6;
-		c3.nextOnFailure = i+4;
-		c3.nextOnSuccess = i+5;
-		c4.nextOnFailure = c4.nextOnSuccess = i+5;
+		c2.nextOnFailure = j+3;
+		c2.nextOnSuccess = j+6;
+		c3.nextOnFailure = j+4;
+		c3.nextOnSuccess = j+5;
+		c4.nextOnFailure = c4.nextOnSuccess = j+5;
 
 		// Once we find one on the second half-lattice, the rest are out.
-		c5.nextOnFailure = i+6;
+		c5.nextOnFailure = j+6;
 		c5.nextOnSuccess = -1;
-		c6.nextOnFailure = i+7;
+		c6.nextOnFailure = j+7;
 		c6.nextOnSuccess = -1;
 		c7.nextOnFailure = c7.nextOnSuccess = -1;
 
 		ose->LOOKUP_3D[i] = c0;
+		ose->LOOKUP_3D[++j] = c1;
+		ose->LOOKUP_3D[++j] = c2;
+		ose->LOOKUP_3D[++j] = c3;
+		ose->LOOKUP_3D[++j] = c4;
+		ose->LOOKUP_3D[++j] = c5;
+		ose->LOOKUP_3D[++j] = c6;
+		ose->LOOKUP_3D[++j] = c7;
 	}
 }
 

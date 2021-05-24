@@ -168,17 +168,12 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 	// Point contributions
 	double value = 0;
-	LatticePoint3D *c = &(ose->LOOKUP_3D[index]);
-	while (c != NULL){
+	while (index >= 0){
+		LatticePoint3D *c = &(ose->LOOKUP_3D[index]);
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
-			if (ose->LOOKUP_3D[index].nextOnFailure > -1){
-				c = &(ose->LOOKUP_3D[ose->LOOKUP_3D[index].nextOnFailure]);
-			}
-			else {
-				c = NULL;
-			}
+			index = ose->LOOKUP_3D[index].nextOnFailure;
 		}
 		else{
 			int pxm = (xrb + c->xrv) & PMASK, pym = (yrb + c->yrv) & PMASK, pzm = (zrb + c->zrv) & PMASK;
@@ -187,12 +182,7 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 
 			attn *= attn;
 			value += attn * attn * extrapolation;
-			if (ose->LOOKUP_3D[index].nextOnSuccess > -1){
-				c = &(ose->LOOKUP_3D[ose->LOOKUP_3D[index].nextOnSuccess]);
-			}
-			else {
-				c = NULL;
-			}
+			index = ose->LOOKUP_3D[index].nextOnSuccess;
 		}
 	}
 	return value;
