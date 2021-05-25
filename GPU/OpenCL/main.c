@@ -285,15 +285,26 @@ size_t* get_global_work_size(size_t* local_work_size, int width, int height){
      return global_work_size;
 }
 
-double* run_kernel(char *kernel_filename, char *function, OpenSimplexEnv *ose, OpenSimplexGradients *osg, unsigned int width, unsigned int height){
+double* run_kernel(
+     char* kernel_filename,
+     char* function,
+     void* host_ptr1,
+     void* host_ptr2,
+     void* host_ptr3,
+     size_t size1,
+     size_t size2,
+     size_t size3,
+     unsigned int width,
+     unsigned int height){
      
      cl_context context;
      cl_command_queue queue;
      cl_program program;
      cl_kernel kernel;
      cl_int errcode_ret;
-     cl_mem device_OpenSimplexEnv_buffer;
-     cl_mem device_OpenSimplexGradients_buffer;
+     cl_mem device_par1_buffer;
+     cl_mem device_par2_buffer;
+     cl_mem device_par3_buffer;
      cl_mem device_output_buffer;
      size_t output_size;
      double *output_buffer;
@@ -321,20 +332,22 @@ double* run_kernel(char *kernel_filename, char *function, OpenSimplexEnv *ose, O
      print_build_log_failure(res, device, program);
      kernel = clCreateKernel(program, function, &errcode_ret);     
      
-     device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexEnv), ose, NULL);
+     device_par1_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size1, host_ptr1, NULL);
      //device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
      //clEnqueueWriteBuffer(queue, device_OpenSimplexEnv_buffer, CL_TRUE, 0, sizeof(OpenSimplexEnv), &ose, 0, NULL, NULL);
-     device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(OpenSimplexGradients), osg, NULL);
+     device_par2_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size2, host_ptr2, NULL);
      //device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexGradients), NULL, NULL);
      //clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, sizeof(OpenSimplexGradients), &osg, 0, NULL, NULL);
+     device_par3_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size3, host_ptr3, NULL);
      device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
      //device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, output_size, output_buffer, NULL);
 
-     clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_OpenSimplexEnv_buffer);
-     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_OpenSimplexGradients_buffer);
-     clSetKernelArg(kernel, 2, sizeof(unsigned int), &width);
-     clSetKernelArg(kernel, 3, sizeof(unsigned int), &height);
-     clSetKernelArg(kernel, 4, sizeof(cl_mem), &device_output_buffer);
+     clSetKernelArg(kernel, 0, sizeof(cl_mem), &device_par1_buffer);
+     clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_par2_buffer);
+     clSetKernelArg(kernel, 2, sizeof(cl_mem), &device_par3_buffer);
+     clSetKernelArg(kernel, 3, sizeof(unsigned int), &width);
+     clSetKernelArg(kernel, 4, sizeof(unsigned int), &height);
+     clSetKernelArg(kernel, 5, sizeof(cl_mem), &device_output_buffer);
 
      size_t* local_work_size = get_local_work_size(kernel, device);
      size_t* global_work_size = get_global_work_size(local_work_size, width, height);
@@ -351,8 +364,9 @@ double* run_kernel(char *kernel_filename, char *function, OpenSimplexEnv *ose, O
           print_error(res);
      }*/
 
-     clReleaseMemObject(device_OpenSimplexEnv_buffer);
-     clReleaseMemObject(device_OpenSimplexGradients_buffer);
+     clReleaseMemObject(device_par1_buffer);
+     clReleaseMemObject(device_par2_buffer);
+     clReleaseMemObject(device_par3_buffer);
      clReleaseMemObject(device_output_buffer);
      clReleaseProgram(program);
      clReleaseKernel(kernel);
@@ -366,53 +380,143 @@ double* run_kernel(char *kernel_filename, char *function, OpenSimplexEnv *ose, O
 }
 
 double* generate_noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise2", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise2",
+          osg->perm,
+          osg->permGrad2,
+          ose->LOOKUP_2D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad2),
+          sizeof(ose->LOOKUP_2D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise2_XBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise2_XBeforeY", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise2_XBeforeY",
+          osg->perm,
+          osg->permGrad2,
+          ose->LOOKUP_2D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad2),
+          sizeof(ose->LOOKUP_2D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise3_Classic", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise3_Classic",
+          osg->perm,
+          osg->permGrad3,
+          ose->LOOKUP_3D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad3),
+          sizeof(ose->LOOKUP_3D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise3_XYBeforeZ", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise3_XYBeforeZ",
+          osg->perm,
+          osg->permGrad3,
+          ose->LOOKUP_3D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad3),
+          sizeof(ose->LOOKUP_3D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise3_XZBeforeY", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise3_XZBeforeY",
+          osg->perm,
+          osg->permGrad3,
+          ose->LOOKUP_3D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad3),
+          sizeof(ose->LOOKUP_3D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise4_Classic", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise4_Classic",
+          osg->perm,
+          osg->permGrad4,
+          ose->VERTICES_4D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad4),
+          sizeof(ose->VERTICES_4D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise4_XYBeforeZW", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise4_XYBeforeZW",
+          osg->perm,
+          osg->permGrad4,
+          ose->VERTICES_4D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad4),
+          sizeof(ose->VERTICES_4D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise4_XZBeforeYW", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise4_XZBeforeYW",
+          osg->perm,
+          osg->permGrad4,
+          ose->VERTICES_4D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad4),
+          sizeof(ose->VERTICES_4D),
+          WIDTH,
+          HEIGHT);
 }
 
 double* generate_noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-     return run_kernel("OpenSimplex2F.cl", "noise4_XYZBeforeW", ose, osg, WIDTH, HEIGHT);
+     return run_kernel(
+          "OpenSimplex2F.cl",
+          "noise4_XYZBeforeW",
+          osg->perm,
+          osg->permGrad4,
+          ose->VERTICES_4D,
+          sizeof(osg->perm),
+          sizeof(osg->permGrad4),
+          sizeof(ose->VERTICES_4D),
+          WIDTH,
+          HEIGHT);
 }
 
 int main(){
      OpenSimplexEnv ose = initOpenSimplex();
      OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
 
-     /*save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
+     save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
      save_bitmap("img/noise2_XBeforeY.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(&ose, &osg));
      save_bitmap("img/noise3_Classic.bmp", WIDTH, HEIGHT, generate_noise3_Classic(&ose, &osg));
      save_bitmap("img/noise3_XYBeforeZ.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(&ose, &osg));
-     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));*/
+     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));
      save_bitmap("img/noise4_Classic.bmp", WIDTH, HEIGHT, generate_noise4_Classic(&ose, &osg));
-     /*save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
+     save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
      save_bitmap("img/noise4_XZBeforeYW.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(&ose, &osg));
-     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));*/
+     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));
      return 0;
 }

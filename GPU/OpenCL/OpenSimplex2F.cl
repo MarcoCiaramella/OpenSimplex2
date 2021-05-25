@@ -109,9 +109,9 @@ double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, do
 }
 
 __kernel void noise2(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global LatticePoint2D* LOOKUP_2D;
+	__global short* perm,
+    __global Grad2* permGrad2,
+    __global LatticePoint2D* LOOKUP_2D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -131,9 +131,9 @@ __kernel void noise2(
 }
 
 __kernel void noise2_XBeforeY(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global LatticePoint2D* LOOKUP_2D;
+	__global short* perm,
+    __global Grad2* permGrad2,
+    __global LatticePoint2D* LOOKUP_2D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -152,7 +152,7 @@ __kernel void noise2_XBeforeY(
 	}
 }
 
-double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, double yr, double zr){
+double _noise3_BCC(short* perm, Grad3* permGrad3, LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
 
 	// Get base and offsets inside cube of first lattice.
 	int xrb = fast_floor(xr), yrb = fast_floor(yr), zrb = fast_floor(zr);
@@ -166,36 +166,29 @@ double _noise3_BCC(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xr, do
 	// Point contributions
 	double value = 0;
 	while (index >= 0){
-		LatticePoint3D *c = &(ose->LOOKUP_3D[index]);
+		LatticePoint3D *c = &(LOOKUP_3D[index]);
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
-			index = ose->LOOKUP_3D[index].nextOnFailure;
+			index = LOOKUP_3D[index].nextOnFailure;
 		}
 		else{
 			int pxm = (xrb + c->xrv) & PMASK, pym = (yrb + c->yrv) & PMASK, pzm = (zrb + c->zrv) & PMASK;
-			Grad3 grad = osg->permGrad3[osg->perm[osg->perm[pxm] ^ pym] ^ pzm];
+			Grad3 grad = permGrad3[perm[perm[pxm] ^ pym] ^ pzm];
 			double extrapolation = grad.dx * dxr + grad.dy * dyr + grad.dz * dzr;
 
 			attn *= attn;
 			value += attn * attn * extrapolation;
-			index = ose->LOOKUP_3D[index].nextOnSuccess;
+			index = LOOKUP_3D[index].nextOnSuccess;
 		}
 	}
 	return value;
 }
 
 __kernel void noise3_Classic(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad3* permGrad3,
+    __global LatticePoint3D* LOOKUP_3D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -214,21 +207,14 @@ __kernel void noise3_Classic(
 		double xr = r - x, yr = r - y, zr = r - z;
 
 		// Evaluate both lattices to form a BCC lattice.
-		output[index] = _noise3_BCC(ose, osg, xr, yr, zr);
+		output[index] = _noise3_BCC(perm, permGrad3, LOOKUP_3D, xr, yr, zr);
 	}
 }
 
 __kernel void noise3_XYBeforeZ(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad3* permGrad3,
+    __global LatticePoint3D* LOOKUP_3D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -249,21 +235,14 @@ __kernel void noise3_XYBeforeZ(
 		double zr = xy * 0.577350269189626 + zz;
 
 		// Evaluate both lattices to form a BCC lattice.
-		output[index] = _noise3_BCC(ose, osg, xr, yr, zr);
+		output[index] = _noise3_BCC(perm, permGrad3, LOOKUP_3D, xr, yr, zr);
 	}
 }
 
 __kernel void noise3_XZBeforeY(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad3* permGrad3,
+    __global LatticePoint3D* LOOKUP_3D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -285,11 +264,11 @@ __kernel void noise3_XZBeforeY(
 		double yr = xz * 0.577350269189626 + yy;
 
 		// Evaluate both lattices to form a BCC lattice.
-		output[index] = _noise3_BCC(ose, osg, xr, yr, zr);
+		output[index] = _noise3_BCC(perm, permGrad3, LOOKUP_3D, xr, yr, zr);
 	}
 }
 
-double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, double ys, double zs, double ws){
+double _noise4_Base(short* perm, Grad4* permGrad4, LatticePoint4D* VERTICES_4D, double xs, double ys, double zs, double ws){
 	double value = 0;
 
 	// Get base points and offsets
@@ -389,7 +368,7 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 	for (int i = 0; i < 5; i++){
 
 		// Update xsb/etc. and add the lattice point's contribution.
-		LatticePoint4D *c = &(ose->VERTICES_4D[vertexIndex]);
+		LatticePoint4D *c = &(VERTICES_4D[vertexIndex]);
 		xsb += c->xsv;
 		ysb += c->ysv;
 		zsb += c->zsv;
@@ -399,7 +378,7 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 		double attn = 0.5 - dx * dx - dy * dy - dz * dz - dw * dw;
 		if (attn > 0){
 			int pxm = xsb & PMASK, pym = ysb & PMASK, pzm = zsb & PMASK, pwm = wsb & PMASK;
-			Grad4 grad = osg->permGrad4[osg->perm[osg->perm[osg->perm[pxm] ^ pym] ^ pzm] ^ pwm];
+			Grad4 grad = permGrad4[perm[perm[perm[pxm] ^ pym] ^ pzm] ^ pwm];
 			double ramped = grad.dx * dx + grad.dy * dy + grad.dz * dz + grad.dw * dw;
 
 			attn *= attn;
@@ -440,16 +419,9 @@ double _noise4_Base(OpenSimplexEnv *ose, OpenSimplexGradients *osg, double xs, d
 }
 
 __kernel void noise4_Classic(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad4* permGrad4,
+    __global LatticePoint4D* VERTICES_4D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -466,21 +438,14 @@ __kernel void noise4_Classic(
 		double s = -0.138196601125011 * (x + y + z + w);
 		double xs = x + s, ys = y + s, zs = z + s, ws = w + s;
 
-		output[index] = _noise4_Base(ose, osg, xs, ys, zs, ws);
+		output[index] = _noise4_Base(perm, permGrad4, VERTICES_4D, xs, ys, zs, ws);
 	}
 }
 
 __kernel void noise4_XYBeforeZW(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad4* permGrad4,
+    __global LatticePoint4D* VERTICES_4D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -497,21 +462,14 @@ __kernel void noise4_XYBeforeZW(
 		double t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
 		double xs = x + s2, ys = y + s2, zs = z + t2, ws = w + t2;
 
-		output[index] = _noise4_Base(ose, osg, xs, ys, zs, ws);
+		output[index] = _noise4_Base(perm, permGrad4, VERTICES_4D, xs, ys, zs, ws);
 	}
 }
 
 __kernel void noise4_XZBeforeYW(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad4* permGrad4,
+    __global LatticePoint4D* VERTICES_4D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -528,21 +486,14 @@ __kernel void noise4_XZBeforeYW(
 		double t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
 		double xs = x + s2, ys = y + t2, zs = z + s2, ws = w + t2;
 
-		output[index] = _noise4_Base(ose, osg, xs, ys, zs, ws);
+		output[index] = _noise4_Base(perm, permGrad4, VERTICES_4D, xs, ys, zs, ws);
 	}
 }
 
 __kernel void noise4_XYZBeforeW(
-	__global short* perm;
-    __global Grad2* permGrad2;
-    __global Grad3* permGrad3;
-    __global Grad4* permGrad4;
-    __global Grad2* GRADIENTS_2D;
-    __global Grad3* GRADIENTS_3D;
-    __global Grad4* GRADIENTS_4D;
-    __global LatticePoint2D* LOOKUP_2D;
-    __global LatticePoint3D* LOOKUP_3D;
-    __global LatticePoint4D* VERTICES_4D;
+	__global short* perm,
+    __global Grad4* permGrad4,
+    __global LatticePoint4D* VERTICES_4D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
@@ -560,6 +511,6 @@ __kernel void noise4_XYZBeforeW(
 		double s2 = xyz * -0.16666666666666666 + ww;
 		double xs = x + s2, ys = y + s2, zs = z + s2, ws = -0.5 * xyz + ww;
 
-		output[index] = _noise4_Base(ose, osg, xs, ys, zs, ws);
+		output[index] = _noise4_Base(perm, permGrad4, VERTICES_4D, xs, ys, zs, ws);
 	}
 }
