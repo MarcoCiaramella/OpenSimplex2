@@ -1,3 +1,7 @@
+#include <CL/cl.h>
+
+
+
 #define PSIZE 2048
 #define PMASK 2047
 #define N2 0.05481866495625118
@@ -6,10 +10,7 @@
 
 
 
-typedef struct {
-    cl_uint length;
-    cl_void *data;
-} vect;
+
 
 typedef struct {
     cl_int xsv, ysv;
@@ -51,9 +52,9 @@ typedef struct {
     Grad2 *GRADIENTS_2D;
     Grad3 *GRADIENTS_3D;
     Grad4 *GRADIENTS_4D;
-    LatticePoint2D *LOOKUP_2D;
-    LatticePoint3D *LOOKUP_3D;
-    vect *LOOKUP_4D;
+    LatticePoint2D* LOOKUP_2D;
+    LatticePoint3D* LOOKUP_3D;
+    LatticePoint4D* LOOKUP_4D;
 } OpenSimplexEnv;
 
 OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
