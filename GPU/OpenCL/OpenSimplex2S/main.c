@@ -2,7 +2,7 @@
 #include <CL/cl.h>
 #include "bitmap.h"
 #include <sys/timeb.h>
-#include "OpenSimplex2F.h"
+#include "OpenSimplex2S.h"
 #include <math.h>
 
 
@@ -58,7 +58,7 @@ void get_GPU_platform(cl_platform_id* gpu_platform){
           exit_on_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, &size));
           printf(platform_name);
           printf("\n");
-          if (strcmp(platform_name, "NVIDIA CUDA") == 0){
+          if (strcmp(platform_name, "NVIDIA CUDA") == 0 || strcmp(platform_name, "AMD Accelerated Parallel Processing") == 0){
                *gpu_platform = platforms[i];
                return;
           }
@@ -455,10 +455,10 @@ double* generate_noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
           "noise4_Classic",
           osg->perm,
           osg->permGrad4,
-          ose->VERTICES_4D,
+          ose->LOOKUP_4D,
           sizeof(osg->perm),
           sizeof(osg->permGrad4),
-          sizeof(ose->VERTICES_4D),
+          sizeof(ose->LOOKUP_4D),
           WIDTH,
           HEIGHT);
 }
@@ -469,10 +469,10 @@ double* generate_noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *os
           "noise4_XYBeforeZW",
           osg->perm,
           osg->permGrad4,
-          ose->VERTICES_4D,
+          ose->LOOKUP_4D,
           sizeof(osg->perm),
           sizeof(osg->permGrad4),
-          sizeof(ose->VERTICES_4D),
+          sizeof(ose->LOOKUP_4D),
           WIDTH,
           HEIGHT);
 }
@@ -483,10 +483,10 @@ double* generate_noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *os
           "noise4_XZBeforeYW",
           osg->perm,
           osg->permGrad4,
-          ose->VERTICES_4D,
+          ose->LOOKUP_4D,
           sizeof(osg->perm),
           sizeof(osg->permGrad4),
-          sizeof(ose->VERTICES_4D),
+          sizeof(ose->LOOKUP_4D),
           WIDTH,
           HEIGHT);
 }
@@ -497,26 +497,26 @@ double* generate_noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *os
           "noise4_XYZBeforeW",
           osg->perm,
           osg->permGrad4,
-          ose->VERTICES_4D,
+          ose->LOOKUP_4D,
           sizeof(osg->perm),
           sizeof(osg->permGrad4),
-          sizeof(ose->VERTICES_4D),
+          sizeof(ose->LOOKUP_4D),
           WIDTH,
           HEIGHT);
 }
 
 int main(){
-     OpenSimplexEnv ose = initOpenSimplex();
-     OpenSimplexGradients osg = newOpenSimplexGradients(&ose, 1234);
+     OpenSimplexEnv* ose = initOpenSimplex();
+     OpenSimplexGradients* osg = newOpenSimplexGradients(ose, 1234);
 
-     save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(&ose, &osg));
-     save_bitmap("img/noise2_XBeforeY.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(&ose, &osg));
-     save_bitmap("img/noise3_Classic.bmp", WIDTH, HEIGHT, generate_noise3_Classic(&ose, &osg));
-     save_bitmap("img/noise3_XYBeforeZ.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(&ose, &osg));
-     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(&ose, &osg));
-     save_bitmap("img/noise4_Classic.bmp", WIDTH, HEIGHT, generate_noise4_Classic(&ose, &osg));
-     save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(&ose, &osg));
-     save_bitmap("img/noise4_XZBeforeYW.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(&ose, &osg));
-     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(&ose, &osg));
+     save_bitmap("img/noise2.bmp", WIDTH, HEIGHT, generate_noise2(ose, osg));
+     save_bitmap("img/noise2_XBeforeY.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(ose, osg));
+     save_bitmap("img/noise3_Classic.bmp", WIDTH, HEIGHT, generate_noise3_Classic(ose, osg));
+     save_bitmap("img/noise3_XYBeforeZ.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(ose, osg));
+     save_bitmap("img/noise3_XZBeforeY.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(ose, osg));
+     save_bitmap("img/noise4_Classic.bmp", WIDTH, HEIGHT, generate_noise4_Classic(ose, osg));
+     save_bitmap("img/noise4_XYBeforeZW.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(ose, osg));
+     save_bitmap("img/noise4_XZBeforeYW.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(ose, osg));
+     save_bitmap("img/noise4_XYZBeforeW.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(ose, osg));
      return 0;
 }

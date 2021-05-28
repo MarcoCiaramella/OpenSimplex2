@@ -18,21 +18,21 @@ Grad4 *_newGrad4Arr(unsigned int size){
     return (Grad4 *) malloc(sizeof(Grad4)*size);
 }
 
-short *_newShortArr(unsigned int size){
-    return (short *) malloc(sizeof(short)*size);
+cl_short *_newShortArr(unsigned int size){
+    return (cl_short *) malloc(sizeof(cl_short)*size);
 }
 
-LatticePoint2D _newLatticePoint2D(int xsv, int ysv){
+LatticePoint2D _newLatticePoint2D(cl_int xsv, cl_int ysv){
 	LatticePoint2D lp2D;
 	lp2D.xsv = xsv;
     lp2D.ysv = ysv;
-	double ssv = (xsv + ysv) * -0.211324865405187;
+	cl_double ssv = (xsv + ysv) * -0.211324865405187;
 	lp2D.dx = -xsv - ssv;
 	lp2D.dy = -ysv - ssv;
 	return lp2D;
 }
 
-LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
+LatticePoint3D _newLatticePoint3D(cl_int xrv, cl_int yrv, cl_int zrv, cl_int lattice){
 	LatticePoint3D lp3D;
 	lp3D.dxr = -xrv + lattice * 0.5;
     lp3D.dyr = -yrv + lattice * 0.5;
@@ -43,13 +43,13 @@ LatticePoint3D _newLatticePoint3D(int xrv, int yrv, int zrv, int lattice){
 	return lp3D;
 }
 
-LatticePoint4D _newLatticePoint4D(int xsv, int ysv, int zsv, int wsv){
+LatticePoint4D _newLatticePoint4D(cl_int xsv, cl_int ysv, cl_int zsv, cl_int wsv){
 	LatticePoint4D lp4D;
     lp4D.xsv = xsv;
     lp4D.ysv = ysv;
     lp4D.zsv = zsv;
     lp4D.wsv = wsv;
-	double ssv = (xsv + ysv + zsv + wsv) * -0.138196601125011;
+	cl_double ssv = (xsv + ysv + zsv + wsv) * -0.138196601125011;
 	lp4D.dx = -xsv - ssv;
 	lp4D.dy = -ysv - ssv;
 	lp4D.dz = -zsv - ssv;
@@ -59,8 +59,8 @@ LatticePoint4D _newLatticePoint4D(int xsv, int ysv, int zsv, int wsv){
 
 LatticePoint2D* _newLatticePoint2DConstArray(){
 	LatticePoint2D* arr = (LatticePoint2D*) malloc(sizeof(LatticePoint2D) * 8 * 4);
-	for (int i = 0; i < 8; i++){
-		int i1, j1, i2, j2;
+	for (cl_int i = 0; i < 8; i++){
+		cl_int i1, j1, i2, j2;
 		if ((i & 1) == 0){
 			if ((i & 2) == 0){
 				i1 = -1;
@@ -107,9 +107,9 @@ LatticePoint2D* _newLatticePoint2DConstArray(){
 
 LatticePoint3D* _newLatticePoint3DConstArray(){
 	LatticePoint3D* arr = (LatticePoint3D*) malloc(sizeof(LatticePoint3D) * 8 * 13);
-	int j = 7;
-	for (int i = 0; i < 8; i++){
-		int i1, j1, k1, i2, j2, k2;
+	cl_int j = 7;
+	for (cl_int i = 0; i < 8; i++){
+		cl_int i1, j1, k1, i2, j2, k2;
 		i1 = (i >> 0) & 1;
 		j1 = (i >> 1) & 1;
 		k1 = (i >> 2) & 1;
@@ -202,7 +202,7 @@ LatticePoint3D* _newLatticePoint3DConstArray(){
 
 LatticePoint4D* _newLatticePoint4DConstArray(){
 		
-	int indices[3476] = {0x15, 0x45, 0x51, 0x54, 0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A, 0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA,
+	cl_int indices[3476] = {0x15, 0x45, 0x51, 0x54, 0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A, 0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA,
 	0x15, 0x45, 0x51, 0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x6A, 0x95, 0x96, 0x9A, 0xA6, 0xAA,
 	0x01, 0x05, 0x11, 0x15, 0x41, 0x45, 0x51, 0x55, 0x56, 0x5A, 0x66, 0x6A, 0x96, 0x9A, 0xA6, 0xAA,
 	0x01, 0x15, 0x16, 0x45, 0x46, 0x51, 0x52, 0x55, 0x56, 0x5A, 0x66, 0x6A, 0x96, 0x9A, 0xA6, 0xAA, 0xAB,
@@ -461,27 +461,27 @@ LatticePoint4D* _newLatticePoint4DConstArray(){
 
 	LatticePoint4D* arr = (LatticePoint4D*) malloc(sizeof(LatticePoint4D) * 3476);
 	LatticePoint4D* latticePoints = (LatticePoint4D*) malloc(sizeof(LatticePoint4D) * 256);
-	for (int i = 0; i < 256; i++){
-		int cx = ((i >> 0) & 3) - 1;
-		int cy = ((i >> 2) & 3) - 1;
-		int cz = ((i >> 4) & 3) - 1;
-		int cw = ((i >> 6) & 3) - 1;
+	for (cl_int i = 0; i < 256; i++){
+		cl_int cx = ((i >> 0) & 3) - 1;
+		cl_int cy = ((i >> 2) & 3) - 1;
+		cl_int cz = ((i >> 4) & 3) - 1;
+		cl_int cw = ((i >> 6) & 3) - 1;
 		latticePoints[i] = _newLatticePoint4D(cx, cy, cz, cw);
 	}
-	for (int i = 0; i < 3476; i++){
+	for (cl_int i = 0; i < 3476; i++){
 		arr[i] = latticePoints[indices[i]];
 	}
 	return arr;
 }
 
-Grad2 _newGrad2(double dx, double dy){
+Grad2 _newGrad2(cl_double dx, cl_double dy){
     Grad2 grad2;
     grad2.dx = dx;
     grad2.dy = dy;
     return grad2;
 }
 
-Grad3 _newGrad3(double dx, double dy, double dz){
+Grad3 _newGrad3(cl_double dx, cl_double dy, cl_double dz){
     Grad3 grad3;
     grad3.dx = dx;
     grad3.dy = dy;
@@ -489,7 +489,7 @@ Grad3 _newGrad3(double dx, double dy, double dz){
     return grad3;
 }
 
-Grad4 _newGrad4(double dx, double dy, double dz, double dw){
+Grad4 _newGrad4(cl_double dx, cl_double dy, cl_double dz, cl_double dw){
     Grad4 grad4;
     grad4.dx = dx;
     grad4.dy = dy;
@@ -500,7 +500,7 @@ Grad4 _newGrad4(double dx, double dy, double dz, double dw){
 
 Grad2 *_newGrad2ConstArray(){
     Grad2 *arr = (Grad2 *) malloc(sizeof(Grad2)*24);
-    int i = 0;
+    cl_int i = 0;
 	arr[i++] = _newGrad2(0.130526192220052, 0.99144486137381);
 	arr[i++] = _newGrad2(0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(0.608761429008721, 0.793353340291235);
@@ -526,11 +526,11 @@ Grad2 *_newGrad2ConstArray(){
 	arr[i++] = _newGrad2(-0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(-0.130526192220052, 0.99144486137381);
 	Grad2 *gradients2D = _newGrad2Arr(PSIZE);
-	for (int i = 0; i < 24; i++){
+	for (cl_int i = 0; i < 24; i++){
 		arr[i].dx /= N2;
 		arr[i].dy /= N2;
 	}
-	for (int i = 0; i < PSIZE; i++){
+	for (cl_int i = 0; i < PSIZE; i++){
 		gradients2D[i] = arr[i % 24];
 	}
 	return gradients2D;
@@ -538,7 +538,7 @@ Grad2 *_newGrad2ConstArray(){
 
 Grad3 *_newGrad3ConstArray(){
 	Grad3 *arr = (Grad3 *)malloc(sizeof(Grad3) * 48);
-	int i = 0;
+	cl_int i = 0;
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, -1.0);
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, 1.0);
 	arr[i++] = _newGrad3(-3.0862664687972017, -1.1721513422464978, 0.0);
@@ -588,12 +588,12 @@ Grad3 *_newGrad3ConstArray(){
 	arr[i++] = _newGrad3(3.0862664687972017, 1.1721513422464978, 0.0);
 	arr[i++] = _newGrad3(1.1721513422464978, 3.0862664687972017, 0.0);
 	Grad3 *gradients3D = _newGrad3Arr(PSIZE);
-	for (int i = 0; i < 48; i++){
+	for (cl_int i = 0; i < 48; i++){
 		arr[i].dx /= N3;
 		arr[i].dy /= N3;
 		arr[i].dz /= N3;
 	}
-	for (int i = 0; i < PSIZE; i++){
+	for (cl_int i = 0; i < PSIZE; i++){
 		gradients3D[i] = arr[i % 48];
 	}
 	return gradients3D;
@@ -601,7 +601,7 @@ Grad3 *_newGrad3ConstArray(){
 
 Grad4 *_newGrad4ConstArray(){
 	Grad4 *arr = (Grad4 *)malloc(sizeof(Grad4) * 160);
-	int i = 0;
+	cl_int i = 0;
 	arr[i++] = _newGrad4(-0.753341017856078, -0.37968289875261624, -0.37968289875261624, -0.37968289875261624);
 	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, -0.4321472685365301, 0.12128480194602098);
 	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, 0.12128480194602098, -0.4321472685365301);
@@ -763,20 +763,20 @@ Grad4 *_newGrad4ConstArray(){
 	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, 0.4321472685365301, -0.12128480194602098);
 	arr[i++] = _newGrad4(0.753341017856078, 0.37968289875261624, 0.37968289875261624, 0.37968289875261624);
 	Grad4 *gradients4D = _newGrad4Arr(PSIZE);
-	for (int i = 0; i < 160; i++){
+	for (cl_int i = 0; i < 160; i++){
 		arr[i].dx /= N4;
 		arr[i].dy /= N4;
 		arr[i].dz /= N4;
 		arr[i].dw /= N4;
 	}
-	for (int i = 0; i < PSIZE; i++){
+	for (cl_int i = 0; i < PSIZE; i++){
 		gradients4D[i] = arr[i % 160];
 	}
 	return gradients4D;
 }
 
 OpenSimplexEnv* initOpenSimplex(){
-	OpenSimplexEnv *ose = (OpenSimplexEnv *) malloc(sizeof(OpenSimplexEnv));
+	OpenSimplexEnv* ose = (OpenSimplexEnv*) malloc(sizeof(OpenSimplexEnv));
 	ose->GRADIENTS_2D = _newGrad2ConstArray();
 	ose->GRADIENTS_3D = _newGrad3ConstArray();
 	ose->GRADIENTS_4D = _newGrad4ConstArray();
@@ -786,18 +786,18 @@ OpenSimplexEnv* initOpenSimplex(){
 	return ose;
 }
 
-OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, long seed){
-	OpenSimplexGradients *osg = (OpenSimplexGradients *)malloc(sizeof(OpenSimplexGradients));
+OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
+	OpenSimplexGradients* osg = (OpenSimplexGradients*) malloc(sizeof(OpenSimplexGradients));
 	osg->perm = _newShortArr(PSIZE);
 	osg->permGrad2 = _newGrad2Arr(PSIZE);
 	osg->permGrad3 = _newGrad3Arr(PSIZE);
 	osg->permGrad4 = _newGrad4Arr(PSIZE);
-	short *source = _newShortArr(PSIZE);
-	for (short i = 0; i < PSIZE; i++)
+	cl_short *source = _newShortArr(PSIZE);
+	for (cl_short i = 0; i < PSIZE; i++)
 		source[i] = i;
-	for (int i = PSIZE - 1; i >= 0; i--){
+	for (cl_int i = PSIZE - 1; i >= 0; i--){
 		seed = seed * 6364136223846793005L + 1442695040888963407L;
-		int r = (int)((seed + 31) % (i + 1));
+		cl_int r = (cl_int)((seed + 31) % (i + 1));
 		if (r < 0)
 			r += (i + 1);
 		osg->perm[i] = source[r];
