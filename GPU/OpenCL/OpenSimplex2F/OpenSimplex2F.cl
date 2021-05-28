@@ -75,7 +75,7 @@ int fast_floor(double x){
 	return x < xi ? xi - 1 : xi;
 }
 
-double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, double xs, double ys){
+double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double xs, double ys){
 	double value = 0;
 
 	// Get base points and offsets
@@ -90,7 +90,7 @@ double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, do
 
 	// Point contributions
 	for (int i = 0; i < 3; i++){
-		LatticePoint2D *c = &(LOOKUP_2D[index + i]);
+		__global LatticePoint2D *c = &(LOOKUP_2D[index + i]);
 
 		double dx = xi + c->dx, dy = yi + c->dy;
 		double attn = 0.5 - dx * dx - dy * dy;
@@ -152,7 +152,7 @@ __kernel void noise2_XBeforeY(
 	}
 }
 
-double _noise3_BCC(short* perm, Grad3* permGrad3, LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
+double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
 
 	// Get base and offsets inside cube of first lattice.
 	int xrb = fast_floor(xr), yrb = fast_floor(yr), zrb = fast_floor(zr);
@@ -166,7 +166,7 @@ double _noise3_BCC(short* perm, Grad3* permGrad3, LatticePoint3D* LOOKUP_3D, dou
 	// Point contributions
 	double value = 0;
 	while (index >= 0){
-		LatticePoint3D *c = &(LOOKUP_3D[index]);
+		__global LatticePoint3D *c = &(LOOKUP_3D[index]);
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
@@ -268,7 +268,7 @@ __kernel void noise3_XZBeforeY(
 	}
 }
 
-double _noise4_Base(short* perm, Grad4* permGrad4, LatticePoint4D* VERTICES_4D, double xs, double ys, double zs, double ws){
+double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global LatticePoint4D* VERTICES_4D, double xs, double ys, double zs, double ws){
 	double value = 0;
 
 	// Get base points and offsets
@@ -368,7 +368,7 @@ double _noise4_Base(short* perm, Grad4* permGrad4, LatticePoint4D* VERTICES_4D, 
 	for (int i = 0; i < 5; i++){
 
 		// Update xsb/etc. and add the lattice point's contribution.
-		LatticePoint4D *c = &(VERTICES_4D[vertexIndex]);
+		__global LatticePoint4D *c = &(VERTICES_4D[vertexIndex]);
 		xsb += c->xsv;
 		ysb += c->ysv;
 		zsb += c->zsv;

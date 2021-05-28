@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <CL/cl.h>
 #include "bitmap.h"
 #include <sys/timeb.h>
 #include "OpenSimplex2F.h"
@@ -58,7 +57,7 @@ void get_GPU_platform(cl_platform_id* gpu_platform){
           exit_on_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, &size));
           printf(platform_name);
           printf("\n");
-          if (strcmp(platform_name, "NVIDIA CUDA") == 0){
+          if (strcmp(platform_name, "NVIDIA CUDA") == 0 || strcmp(platform_name, "AMD Accelerated Parallel Processing") == 0){
                *gpu_platform = platforms[i];
                return;
           }

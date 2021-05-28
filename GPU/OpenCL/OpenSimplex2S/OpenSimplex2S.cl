@@ -77,7 +77,7 @@ int fast_floor(double x){
 	 * 2D SuperSimplex noise base.
 	 * Lookup table implementation inspired by DigitalShadow.
 	 */
-double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, double xs, double ys){
+double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double xs, double ys){
 	double value = 0;
 
 	// Get base points and offsets
@@ -96,7 +96,7 @@ double _noise2_Base(short* perm, Grad2* permGrad2, LatticePoint2D* LOOKUP_2D, do
 
 	// Point contributions
 	for (int i = 0; i < 4; i++){
-		LatticePoint2D *c = ose->LOOKUP_2D[index + i];
+		__global LatticePoint2D *c = ose->LOOKUP_2D[index + i];
 
 		double dx = xi + c->dx, dy = yi + c->dy;
 		double attn = 2.0 / 3.0 - dx * dx - dy * dy;
@@ -172,7 +172,7 @@ __kernel void noise2_XBeforeY(
 	 * It was actually faster to narrow down the points in the loop itself,
 	 * than to build up the index with enough info to isolate 8 points.
 	 */
-double _noise3_BCC(short* perm, Grad3* permGrad3, LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
+double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
 
 	// Get base and offsets inside cube of first lattice.
 	int xrb = fast_floor(xr), yrb = fast_floor(yr), zrb = fast_floor(zr);
@@ -185,7 +185,7 @@ double _noise3_BCC(short* perm, Grad3* permGrad3, LatticePoint3D* LOOKUP_3D, dou
 
 	// Point contributions
 	double value = 0;
-	LatticePoint3D *c = ose->LOOKUP_3D[index];
+	__global LatticePoint3D *c = ose->LOOKUP_3D[index];
 	while (c != NULL){
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.75 - dxr * dxr - dyr * dyr - dzr * dzr;
@@ -313,7 +313,7 @@ __kernel void noise3_XZBeforeY(
 	 * This isn't as elegant or SIMD/GPU/etc. portable as other approaches,
 	 * but it does compete performance-wise with optimized OpenSimplex1.
 	 */
-double _noise4_Base(short* perm, Grad4* permGrad4, LatticePoint4D* VERTICES_4D, double xs, double ys, double zs, double ws){
+double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global LatticePoint4D* VERTICES_4D, double xs, double ys, double zs, double ws){
 	const unsigned int sizes[256] = {
 		20, 15, 16, 17, 15, 16, 12, 15, 16, 12, 10, 14, 17, 15, 14,
 		17, 15, 16, 12, 15, 16, 14, 14, 13, 12, 14, 11, 12, 15, 13,
@@ -370,7 +370,7 @@ double _noise4_Base(short* perm, Grad4* permGrad4, LatticePoint4D* VERTICES_4D, 
 	int index = ((fast_floor(xs * 4) & 3) << 0) | ((fast_floor(ys * 4) & 3) << 2) | ((fast_floor(zs * 4) & 3) << 4) | ((fast_floor(ws * 4) & 3) << 6);
 
 	// Point contributions
-	LatticePoint4D* c = &(ose->LOOKUP_4D[offsets[index]]);
+	__global LatticePoint4D* c = &(ose->LOOKUP_4D[offsets[index]]);
 	for (int i = 0; i < sizes[index]; i++){
 		double dx = xi + c->dx, dy = yi + c->dy, dz = zi + c->dz, dw = wi + c->dw;
 		double attn = 0.8 - dx * dx - dy * dy - dz * dz - dw * dw;
