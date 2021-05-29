@@ -1,5 +1,4 @@
 #include "OpenSimplex2F.h"
-#include <stdbool.h>
 
 
 
@@ -441,4 +440,112 @@ OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
 		source[r] = source[i];
     }
 	return osg;
+}
+
+double *noise2(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise2",
+		osg->perm,
+		osg->permGrad2,
+		ose->LOOKUP_2D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad2),
+		sizeof(ose->LOOKUP_2D));
+}
+
+double *noise2_XBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise2_XBeforeY",
+		osg->perm,
+		osg->permGrad2,
+		ose->LOOKUP_2D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad2),
+		sizeof(ose->LOOKUP_2D));
+}
+
+double *noise3_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise3_Classic",
+		osg->perm,
+		osg->permGrad3,
+		ose->LOOKUP_3D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad3),
+		sizeof(ose->LOOKUP_3D));
+}
+
+double *noise3_XYBeforeZ(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise3_XYBeforeZ",
+		osg->perm,
+		osg->permGrad3,
+		ose->LOOKUP_3D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad3),
+		sizeof(ose->LOOKUP_3D));
+}
+
+double *noise3_XZBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise3_XZBeforeY",
+		osg->perm,
+		osg->permGrad3,
+		ose->LOOKUP_3D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad3),
+		sizeof(ose->LOOKUP_3D));
+}
+
+double *noise4_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise4_Classic",
+		osg->perm,
+		osg->permGrad4,
+		ose->VERTICES_4D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad4),
+		sizeof(ose->VERTICES_4D));
+}
+
+double *noise4_XYBeforeZW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise4_XYBeforeZW",
+		osg->perm,
+		osg->permGrad4,
+		ose->VERTICES_4D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad4),
+		sizeof(ose->VERTICES_4D));
+}
+
+double *noise4_XZBeforeYW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise4_XZBeforeYW",
+		osg->perm,
+		osg->permGrad4,
+		ose->VERTICES_4D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad4),
+		sizeof(ose->VERTICES_4D));
+}
+
+double *noise4_XYZBeforeW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg){
+	return run_kernel(
+		openCLEnv,
+		"noise4_XYZBeforeW",
+		osg->perm,
+		osg->permGrad4,
+		ose->VERTICES_4D,
+		sizeof(osg->perm),
+		sizeof(osg->permGrad4),
+		sizeof(ose->VERTICES_4D));
 }
