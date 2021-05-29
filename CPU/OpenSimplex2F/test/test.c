@@ -6,8 +6,8 @@
 
 
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 2
+#define HEIGHT 2
 #define PERIOD 64.0
 #define OFF_X 2048
 #define OFF_Y 2048	
@@ -135,8 +135,9 @@ void generate_testing_images(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise2.bmp", save_bitmap("test/img/noise2_tmp.bmp", WIDTH, HEIGHT, generate_noise2(ose, osg)));
+    double **noise = generate_noise2(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise2.bmp", save_bitmap("test/img/noise2_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise2 passed: %fs\n", s);
@@ -150,8 +151,9 @@ void test_noise2(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise2_XBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise2_XBeforeY.bmp", save_bitmap("test/img/noise2_XBeforeY_tmp.bmp", WIDTH, HEIGHT, generate_noise2_XBeforeY(ose, osg)));
+    double **noise = generate_noise2_XBeforeY(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise2_XBeforeY.bmp", save_bitmap("test/img/noise2_XBeforeY_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise2_XBeforeY passed: %fs\n", s);
@@ -165,8 +167,9 @@ void test_noise2_XBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise3_Classic.bmp", save_bitmap("test/img/noise3_Classic_tmp.bmp", WIDTH, HEIGHT, generate_noise3_Classic(ose, osg)));
+    double **noise = generate_noise3_Classic(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise3_Classic.bmp", save_bitmap("test/img/noise3_Classic_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise3_Classic passed: %fs\n", s);
@@ -180,8 +183,9 @@ void test_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise3_XYBeforeZ.bmp", save_bitmap("test/img/noise3_XYBeforeZ_tmp.bmp", WIDTH, HEIGHT, generate_noise3_XYBeforeZ(ose, osg)));
+    double **noise = generate_noise3_XYBeforeZ(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise3_XYBeforeZ.bmp", save_bitmap("test/img/noise3_XYBeforeZ_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise3_XYBeforeZ passed: %fs\n", s);
@@ -195,8 +199,9 @@ void test_noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise3_XZBeforeY.bmp", save_bitmap("test/img/noise3_XZBeforeY_tmp.bmp", WIDTH, HEIGHT, generate_noise3_XZBeforeY(ose, osg)));
+    double **noise = generate_noise3_XZBeforeY(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise3_XZBeforeY.bmp", save_bitmap("test/img/noise3_XZBeforeY_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise3_XZBeforeY passed: %fs\n", s);
@@ -210,8 +215,9 @@ void test_noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise4_Classic.bmp", save_bitmap("test/img/noise4_Classic_tmp.bmp", WIDTH, HEIGHT, generate_noise4_Classic(ose, osg)));
+    double **noise = generate_noise4_Classic(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise4_Classic.bmp", save_bitmap("test/img/noise4_Classic_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise4_Classic passed: %fs\n", s);
@@ -225,8 +231,9 @@ void test_noise4_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise4_XYBeforeZW.bmp", save_bitmap("test/img/noise4_XYBeforeZW_tmp.bmp", WIDTH, HEIGHT, generate_noise4_XYBeforeZW(ose, osg)));
+    double **noise = generate_noise4_XYBeforeZW(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise4_XYBeforeZW.bmp", save_bitmap("test/img/noise4_XYBeforeZW_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise4_XYBeforeZW passed: %fs\n", s);
@@ -240,8 +247,9 @@ void test_noise4_XYBeforeZW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise4_XZBeforeYW.bmp", save_bitmap("test/img/noise4_XZBeforeYW_tmp.bmp", WIDTH, HEIGHT, generate_noise4_XZBeforeYW(ose, osg)));
+    double **noise = generate_noise4_XZBeforeYW(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise4_XZBeforeYW.bmp", save_bitmap("test/img/noise4_XZBeforeYW_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise4_XZBeforeYW passed: %fs\n", s);
@@ -255,8 +263,9 @@ void test_noise4_XZBeforeYW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
 void test_noise4_XYZBeforeW(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
     struct timeb start, end;
     ftime(&start);
-    int res = bitmap_compare("test/img/noise4_XYZBeforeW.bmp", save_bitmap("test/img/noise4_XYZBeforeW_tmp.bmp", WIDTH, HEIGHT, generate_noise4_XYZBeforeW(ose, osg)));
+    double **noise = generate_noise4_XYZBeforeW(ose, osg);
     ftime(&end);
+    int res = bitmap_compare("test/img/noise4_XYZBeforeW.bmp", save_bitmap("test/img/noise4_XYZBeforeW_tmp.bmp", WIDTH, HEIGHT, noise));
     float s = get_time_s(start, end);
     if (res){
         printf("test noise4_XYZBeforeW passed: %fs\n", s);
