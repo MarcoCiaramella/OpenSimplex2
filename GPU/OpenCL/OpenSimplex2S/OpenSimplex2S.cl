@@ -523,7 +523,7 @@ __kernel void noise4_XZBeforeYW(
 	 * and W for an extra degree of freedom.
 	 * Recommended for time-varied animations which texture a 3D object (W=time)
 	 */
-__kernel void noise4_XYZBeforeW(
+/*__kernel void noise4_XYZBeforeW(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
@@ -544,5 +544,5 @@ __kernel void noise4_XYZBeforeW(
 
 		output[index] = _noise4_Base(perm, permGrad4, LOOKUP_4D, xs, ys, zs, ws);
 	}
-}
+}*/
 
