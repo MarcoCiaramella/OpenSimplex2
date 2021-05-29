@@ -2,7 +2,7 @@
 GPU implementation in C of [OpenSimplex 2](https://github.com/KdotJPG/OpenSimplex2)
 
 ## How to use
-Make sure you have a driver supporting OpenCL.
+Make sure you have an OpenCL driver installed.
 ### OpenSimplex2F
 ```c
 /* file test.c */
@@ -67,7 +67,9 @@ int main(){
 ```
 
 ## How to compile
+Download the official OpenCL headers [repository](https://github.com/KhronosGroup/OpenCL-Headers)
 ### gcc
+Compiling OpenSimplex2S example:
 ```shell
 gcc *.c /path/to/OpenSimplex2S/*.c -IC:/path/to/OpenCL-Headers -IC:/path/to/OpenSimplex2S -LC:/path/to/OpenCL_lib -lOpenCL -o test.exe
 ```
