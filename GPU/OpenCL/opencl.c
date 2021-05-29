@@ -17,87 +17,6 @@ float get_time_s(struct timeb start, struct timeb end){
 	return ms / 1000.0;
 }
 
-void exit_on_error(cl_int res){
-	if (res != CL_SUCCESS){
-		printf("Error.\n");
-		exit(-1);
-	}
-}
-
-cl_uint get_num_GPU_devices(cl_platform_id platform){
-	cl_uint num_devices;
-	exit_on_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, NULL, &num_devices));
-	return num_devices;
-}
-
-void get_GPU_device(cl_platform_id platform, cl_device_id *device){
-	if (get_num_GPU_devices(platform) > 0){
-		cl_device_id devices[1];
-		exit_on_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, devices, NULL));
-		*device = devices[0];
-		return;
-	}
-	printf("No GPU device found.\n");
-	exit(0);
-}
-
-void get_GPU_platform(cl_platform_id *gpu_platform){
-	cl_uint num_platforms;
-	cl_platform_id *platforms;
-	exit_on_error(clGetPlatformIDs(0, NULL, &num_platforms));
-	platforms = (cl_platform_id *)malloc(sizeof(cl_platform_id) * num_platforms);
-	exit_on_error(clGetPlatformIDs(num_platforms, platforms, NULL));
-	for (int i = 0; i < num_platforms; i++){
-		char platform_name[255];
-		size_t size;
-		exit_on_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, &size));
-		printf(platform_name);
-		printf("\n");
-		if (strcmp(platform_name, "NVIDIA CUDA") == 0 || strcmp(platform_name, "AMD Accelerated Parallel Processing") == 0){
-			*gpu_platform = platforms[i];
-			return;
-		}
-	}
-	printf("No GPU platform found.\n");
-	exit(0);
-}
-
-cl_ulong get_GPU_mem(cl_device_id device){
-	cl_ulong size;
-	clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong), &size, 0);
-	return size;
-}
-
-char *read_file(char *filename){
-	FILE *infile;
-	char *buffer;
-	long numbytes;
-
-	infile = fopen(filename, "r");
-
-	if (infile == NULL){
-		printf("Error reading file.\n");
-		exit(-1);
-	}
-
-	fseek(infile, 0L, SEEK_END);
-	numbytes = ftell(infile);
-
-	fseek(infile, 0L, SEEK_SET);
-
-	buffer = (char *)calloc(numbytes, sizeof(char));
-
-	if (buffer == NULL){
-		printf("Error reading file.\n");
-		exit(-1);
-	}
-
-	fread(buffer, sizeof(char), numbytes, infile);
-	fclose(infile);
-
-	return buffer;
-}
-
 char *get_error(cl_int res){
 	switch (res){
 	case CL_SUCCESS:
@@ -227,6 +146,87 @@ void print_error(cl_int res){
 	if (res != CL_SUCCESS){
 		printf("error %s\n", get_error(res));
 	}
+}
+
+void exit_on_error(cl_int res){
+	if (res != CL_SUCCESS){
+		print_error(res);
+		exit(-1);
+	}
+}
+
+cl_uint get_num_GPU_devices(cl_platform_id platform){
+	cl_uint num_devices;
+	exit_on_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 0, NULL, &num_devices));
+	return num_devices;
+}
+
+void get_GPU_device(cl_platform_id platform, cl_device_id *device){
+	if (get_num_GPU_devices(platform) > 0){
+		cl_device_id devices[1];
+		exit_on_error(clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, devices, NULL));
+		*device = devices[0];
+		return;
+	}
+	printf("No GPU device found.\n");
+	exit(0);
+}
+
+void get_GPU_platform(cl_platform_id *gpu_platform){
+	cl_uint num_platforms;
+	cl_platform_id *platforms;
+	exit_on_error(clGetPlatformIDs(0, NULL, &num_platforms));
+	platforms = (cl_platform_id *)malloc(sizeof(cl_platform_id) * num_platforms);
+	exit_on_error(clGetPlatformIDs(num_platforms, platforms, NULL));
+	for (int i = 0; i < num_platforms; i++){
+		char platform_name[255];
+		size_t size;
+		exit_on_error(clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, sizeof(platform_name), platform_name, &size));
+		printf(platform_name);
+		printf("\n");
+		if (strcmp(platform_name, "NVIDIA CUDA") == 0 || strcmp(platform_name, "AMD Accelerated Parallel Processing") == 0){
+			*gpu_platform = platforms[i];
+			return;
+		}
+	}
+	printf("No GPU platform found.\n");
+	exit(0);
+}
+
+cl_ulong get_GPU_mem(cl_device_id device){
+	cl_ulong size;
+	clGetDeviceInfo(device, CL_DEVICE_LOCAL_MEM_SIZE, sizeof(cl_ulong), &size, 0);
+	return size;
+}
+
+char *read_file(char *filename){
+	FILE *infile;
+	char *buffer;
+	long numbytes;
+
+	infile = fopen(filename, "r");
+
+	if (infile == NULL){
+		printf("Error reading file.\n");
+		exit(-1);
+	}
+
+	fseek(infile, 0L, SEEK_END);
+	numbytes = ftell(infile);
+
+	fseek(infile, 0L, SEEK_SET);
+
+	buffer = (char *)calloc(numbytes, sizeof(char));
+
+	if (buffer == NULL){
+		printf("Error reading file.\n");
+		exit(-1);
+	}
+
+	fread(buffer, sizeof(char), numbytes, infile);
+	fclose(infile);
+
+	return buffer;
 }
 
 void print_build_log_failure(cl_int res, cl_device_id device, cl_program program){

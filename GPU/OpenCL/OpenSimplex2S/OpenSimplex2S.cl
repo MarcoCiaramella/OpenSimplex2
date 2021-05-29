@@ -530,19 +530,14 @@ __kernel void noise4_XZBeforeYW(
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
-
 	int index = get_index(width, height);
     if (index >= 0){
-
 		double x = get_x();
 		double y = get_y();
-
 		double xyz = x + y + z;
 		double ww = w * 1.118033988749894;
 		double s2 = xyz * -0.16666666666666666 + ww;
 		double xs = x + s2, ys = y + s2, zs = z + s2, ws = -0.5 * xyz + ww;
-
 		output[index] = _noise4_Base(perm, permGrad4, LOOKUP_4D, xs, ys, zs, ws);
 	}
 }*/
-

@@ -2,21 +2,6 @@
 
 
 
-Grad2 *_newGrad2Arr(unsigned int size){
-	return (Grad2 *)malloc(sizeof(Grad2) * size);
-}
-
-Grad3 *_newGrad3Arr(unsigned int size){
-	return (Grad3 *)malloc(sizeof(Grad3) * size);
-}
-
-Grad4 *_newGrad4Arr(unsigned int size){
-	return (Grad4 *)malloc(sizeof(Grad4) * size);
-}
-
-cl_short *_newShortArr(unsigned int size){
-	return (cl_short *)malloc(sizeof(cl_short) * size);
-}
 
 LatticePoint2D _newLatticePoint2D(cl_int xsv, cl_int ysv){
 	LatticePoint2D lp2D;
@@ -53,8 +38,7 @@ LatticePoint4D _newLatticePoint4D(cl_int xsv, cl_int ysv, cl_int zsv, cl_int wsv
 	return lp4D;
 }
 
-LatticePoint2D *_newLatticePoint2DConstArray(){
-	LatticePoint2D *arr = (LatticePoint2D *)malloc(sizeof(LatticePoint2D) * 8 * 4);
+void _loadLatticePoint2DConstArray(OpenSimplexEnv *ose){
 	for (cl_int i = 0; i < 8; i++){
 		cl_int i1, j1, i2, j2;
 		if ((i & 1) == 0){
@@ -93,16 +77,14 @@ LatticePoint2D *_newLatticePoint2DConstArray(){
 				j2 = 0;
 			}
 		}
-		arr[i * 4 + 0] = _newLatticePoint2D(0, 0);
-		arr[i * 4 + 1] = _newLatticePoint2D(1, 1);
-		arr[i * 4 + 2] = _newLatticePoint2D(i1, j1);
-		arr[i * 4 + 3] = _newLatticePoint2D(i2, j2);
+		ose->LOOKUP_2D[i * 4 + 0] = _newLatticePoint2D(0, 0);
+		ose->LOOKUP_2D[i * 4 + 1] = _newLatticePoint2D(1, 1);
+		ose->LOOKUP_2D[i * 4 + 2] = _newLatticePoint2D(i1, j1);
+		ose->LOOKUP_2D[i * 4 + 3] = _newLatticePoint2D(i2, j2);
 	}
-	return arr;
 }
 
-LatticePoint3D *_newLatticePoint3DConstArray(){
-	LatticePoint3D *arr = (LatticePoint3D *)malloc(sizeof(LatticePoint3D) * 8 * 14);
+void _loadLatticePoint3DConstArray(OpenSimplexEnv *ose){
 	cl_int j = 7;
 	for (cl_int i = 0; i < 8; i++){
 		cl_int i1, j1, k1, i2, j2, k2;
@@ -178,25 +160,24 @@ LatticePoint3D *_newLatticePoint3DConstArray(){
 		cC.nextOnSuccess = -1;
 		cD.nextOnFailure = cD.nextOnSuccess = -1;
 
-		arr[i] = c0;
-		arr[++j] = c1;
-		arr[++j] = c2;
-		arr[++j] = c3;
-		arr[++j] = c4;
-		arr[++j] = c5;
-		arr[++j] = c6;
-		arr[++j] = c7;
-		arr[++j] = c8;
-		arr[++j] = c9;
-		arr[++j] = cA;
-		arr[++j] = cB;
-		arr[++j] = cC;
-		arr[++j] = cD;
+		ose->LOOKUP_3D[i] = c0;
+		ose->LOOKUP_3D[++j] = c1;
+		ose->LOOKUP_3D[++j] = c2;
+		ose->LOOKUP_3D[++j] = c3;
+		ose->LOOKUP_3D[++j] = c4;
+		ose->LOOKUP_3D[++j] = c5;
+		ose->LOOKUP_3D[++j] = c6;
+		ose->LOOKUP_3D[++j] = c7;
+		ose->LOOKUP_3D[++j] = c8;
+		ose->LOOKUP_3D[++j] = c9;
+		ose->LOOKUP_3D[++j] = cA;
+		ose->LOOKUP_3D[++j] = cB;
+		ose->LOOKUP_3D[++j] = cC;
+		ose->LOOKUP_3D[++j] = cD;
 	}
-	return arr;
 }
 
-LatticePoint4D *_newLatticePoint4DConstArray(){
+void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
 
 	cl_int indices[3476] = {0x15, 0x45, 0x51, 0x54, 0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A, 0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA,
 							0x15, 0x45, 0x51, 0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x6A, 0x95, 0x96, 0x9A, 0xA6, 0xAA,
@@ -455,7 +436,6 @@ LatticePoint4D *_newLatticePoint4DConstArray(){
 							0x55, 0x59, 0x65, 0x69, 0x6A, 0x95, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA, 0xAE, 0xBA, 0xEA,
 							0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A, 0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA, 0xAB, 0xAE, 0xBA, 0xEA};
 
-	LatticePoint4D *arr = (LatticePoint4D *)malloc(sizeof(LatticePoint4D) * 3476);
 	LatticePoint4D *latticePoints = (LatticePoint4D *)malloc(sizeof(LatticePoint4D) * 256);
 	for (cl_int i = 0; i < 256; i++){
 		cl_int cx = ((i >> 0) & 3) - 1;
@@ -465,10 +445,9 @@ LatticePoint4D *_newLatticePoint4DConstArray(){
 		latticePoints[i] = _newLatticePoint4D(cx, cy, cz, cw);
 	}
 	for (cl_int i = 0; i < 3476; i++){
-		arr[i] = latticePoints[indices[i]];
+		ose->LOOKUP_4D[i] = latticePoints[indices[i]];
 	}
 	free(latticePoints);
-	return arr;
 }
 
 Grad2 _newGrad2(cl_double dx, cl_double dy){
@@ -495,9 +474,9 @@ Grad4 _newGrad4(cl_double dx, cl_double dy, cl_double dz, cl_double dw){
 	return grad4;
 }
 
-Grad2 *_newGrad2ConstArray(){
-	Grad2 *arr = (Grad2 *)malloc(sizeof(Grad2) * 24);
-	cl_int i = 0;
+void _loadGrad2ConstArray(OpenSimplexEnv *ose){
+	Grad2 arr[24];
+    cl_int i = 0;
 	arr[i++] = _newGrad2(0.130526192220052, 0.99144486137381);
 	arr[i++] = _newGrad2(0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(0.608761429008721, 0.793353340291235);
@@ -522,20 +501,17 @@ Grad2 *_newGrad2ConstArray(){
 	arr[i++] = _newGrad2(-0.608761429008721, 0.793353340291235);
 	arr[i++] = _newGrad2(-0.38268343236509, 0.923879532511287);
 	arr[i++] = _newGrad2(-0.130526192220052, 0.99144486137381);
-	Grad2 *gradients2D = _newGrad2Arr(PSIZE);
 	for (cl_int i = 0; i < 24; i++){
 		arr[i].dx /= N2;
 		arr[i].dy /= N2;
 	}
 	for (cl_int i = 0; i < PSIZE; i++){
-		gradients2D[i] = arr[i % 24];
+		ose->GRADIENTS_2D[i] = arr[i % 24];
 	}
-	free(arr);
-	return gradients2D;
 }
 
-Grad3 *_newGrad3ConstArray(){
-	Grad3 *arr = (Grad3 *)malloc(sizeof(Grad3) * 48);
+void _loadGrad3ConstArray(OpenSimplexEnv *ose){
+	Grad3 arr[48];
 	cl_int i = 0;
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, -1.0);
 	arr[i++] = _newGrad3(-2.22474487139, -2.22474487139, 1.0);
@@ -585,21 +561,18 @@ Grad3 *_newGrad3ConstArray(){
 	arr[i++] = _newGrad3(2.22474487139, 2.22474487139, 1.0);
 	arr[i++] = _newGrad3(3.0862664687972017, 1.1721513422464978, 0.0);
 	arr[i++] = _newGrad3(1.1721513422464978, 3.0862664687972017, 0.0);
-	Grad3 *gradients3D = _newGrad3Arr(PSIZE);
 	for (cl_int i = 0; i < 48; i++){
 		arr[i].dx /= N3;
 		arr[i].dy /= N3;
 		arr[i].dz /= N3;
 	}
 	for (cl_int i = 0; i < PSIZE; i++){
-		gradients3D[i] = arr[i % 48];
+		ose->GRADIENTS_3D[i] = arr[i % 48];
 	}
-	free(arr);
-	return gradients3D;
 }
 
-Grad4 *_newGrad4ConstArray(){
-	Grad4 *arr = (Grad4 *)malloc(sizeof(Grad4) * 160);
+void _loadGrad4ConstArray(OpenSimplexEnv *ose){
+	Grad4 arr[160];
 	cl_int i = 0;
 	arr[i++] = _newGrad4(-0.753341017856078, -0.37968289875261624, -0.37968289875261624, -0.37968289875261624);
 	arr[i++] = _newGrad4(-0.7821684431180708, -0.4321472685365301, -0.4321472685365301, 0.12128480194602098);
@@ -761,7 +734,6 @@ Grad4 *_newGrad4ConstArray(){
 	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, -0.12128480194602098, 0.4321472685365301);
 	arr[i++] = _newGrad4(0.7821684431180708, 0.4321472685365301, 0.4321472685365301, -0.12128480194602098);
 	arr[i++] = _newGrad4(0.753341017856078, 0.37968289875261624, 0.37968289875261624, 0.37968289875261624);
-	Grad4 *gradients4D = _newGrad4Arr(PSIZE);
 	for (cl_int i = 0; i < 160; i++){
 		arr[i].dx /= N4;
 		arr[i].dy /= N4;
@@ -769,30 +741,24 @@ Grad4 *_newGrad4ConstArray(){
 		arr[i].dw /= N4;
 	}
 	for (cl_int i = 0; i < PSIZE; i++){
-		gradients4D[i] = arr[i % 160];
+		ose->GRADIENTS_4D[i] = arr[i % 160];
 	}
-	free(arr);
-	return gradients4D;
 }
 
 OpenSimplexEnv *initOpenSimplex(){
-	OpenSimplexEnv *ose = (OpenSimplexEnv *)malloc(sizeof(OpenSimplexEnv));
-	ose->GRADIENTS_2D = _newGrad2ConstArray();
-	ose->GRADIENTS_3D = _newGrad3ConstArray();
-	ose->GRADIENTS_4D = _newGrad4ConstArray();
-	ose->LOOKUP_2D = _newLatticePoint2DConstArray();
-	ose->LOOKUP_3D = _newLatticePoint3DConstArray();
-	ose->LOOKUP_4D = _newLatticePoint4DConstArray();
+	OpenSimplexEnv *ose = (OpenSimplexEnv*) malloc(sizeof(OpenSimplexEnv));
+	_loadGrad2ConstArray(ose);
+	_loadGrad3ConstArray(ose);
+	_loadGrad3ConstArray(ose);
+	_loadLatticePoint2DConstArray(ose);
+	_loadLatticePoint3DConstArray(ose);
+	_loadLatticePoint4DConstArray(ose);
 	return ose;
 }
 
 OpenSimplexGradients *newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
-	OpenSimplexGradients *osg = (OpenSimplexGradients *)malloc(sizeof(OpenSimplexGradients));
-	osg->perm = _newShortArr(PSIZE);
-	osg->permGrad2 = _newGrad2Arr(PSIZE);
-	osg->permGrad3 = _newGrad3Arr(PSIZE);
-	osg->permGrad4 = _newGrad4Arr(PSIZE);
-	cl_short *source = _newShortArr(PSIZE);
+	OpenSimplexGradients *osg = (OpenSimplexGradients*) malloc(sizeof(OpenSimplexGradients));
+	cl_short source[PSIZE];
 	for (cl_short i = 0; i < PSIZE; i++)
 		source[i] = i;
 	for (cl_int i = PSIZE - 1; i >= 0; i--){
