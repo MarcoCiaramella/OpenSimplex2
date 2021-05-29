@@ -39,5 +39,5 @@ int main(){
 ## How to compile
 ### gcc
 ```shell
-gcc *.c OpenSimplex2S/*.c -IC:\path\to\OpenCL-Headers -LC:\path\to\OpenCL_lib -lOpenCL -o main.exe
+gcc *.c /path/to/OpenSimplex2S/*.c -IC:/path/to/OpenCL-Headers -IC:/path/to/OpenSimplex2S -LC:/path/to/OpenCL_lib -lOpenCL -o main.exe
 ```

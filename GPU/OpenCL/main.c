@@ -1,6 +1,6 @@
 #include "bitmap.h"
-#include "OpenSimplex2S\OpenSimplex2S.h"
-//#include "OpenSimplex2F\OpenSimplex2F.h"
+#include "OpenSimplex2S.h"
+//#include "OpenSimplex2F.h"
 
 
 
