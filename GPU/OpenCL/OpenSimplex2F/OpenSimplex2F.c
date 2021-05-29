@@ -410,19 +410,19 @@ void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
 	}
 }
 
-OpenSimplexEnv initOpenSimplex(){
-	OpenSimplexEnv ose;
-	_loadGrad2ConstArray(&ose);
-	_loadGrad3ConstArray(&ose);
-	_loadGrad4ConstArray(&ose);
-	_loadLatticePoint2DConstArray(&ose);
-	_loadLatticePoint3DConstArray(&ose);
-	_loadLatticePoint4DConstArray(&ose);
+OpenSimplexEnv* initOpenSimplex(){
+	OpenSimplexEnv* ose = (OpenSimplexEnv*) malloc(sizeof(OpenSimplexEnv));
+	_loadGrad2ConstArray(ose);
+	_loadGrad3ConstArray(ose);
+	_loadGrad4ConstArray(ose);
+	_loadLatticePoint2DConstArray(ose);
+	_loadLatticePoint3DConstArray(ose);
+	_loadLatticePoint4DConstArray(ose);
 	return ose;
 }
 
-OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
-    OpenSimplexGradients osg;
+OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
+    OpenSimplexGradients* osg = (OpenSimplexGradients*) malloc(sizeof(OpenSimplexGradients));
     cl_short source[PSIZE];
     for (cl_short i = 0; i < PSIZE; i++){
         source[i] = i;
@@ -433,10 +433,10 @@ OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed){
 		if (r < 0){
             r += (i + 1);
         }
-		osg.perm[i] = source[r];
-		osg.permGrad2[i] = ose->GRADIENTS_2D[osg.perm[i]];
-		osg.permGrad3[i] = ose->GRADIENTS_3D[osg.perm[i]];
-		osg.permGrad4[i] = ose->GRADIENTS_4D[osg.perm[i]];
+		osg->perm[i] = source[r];
+		osg->permGrad2[i] = ose->GRADIENTS_2D[osg->perm[i]];
+		osg->permGrad3[i] = ose->GRADIENTS_3D[osg->perm[i]];
+		osg->permGrad4[i] = ose->GRADIENTS_4D[osg->perm[i]];
 		source[r] = source[i];
     }
 	return osg;

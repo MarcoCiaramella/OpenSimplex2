@@ -87,8 +87,8 @@ typedef struct {
 } OpenSimplexEnv;
 
 
-OpenSimplexEnv initOpenSimplex();
-OpenSimplexGradients newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
+OpenSimplexEnv* initOpenSimplex();
+OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
 double *noise2(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
 double *noise2_XBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
 double *noise3_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
