@@ -73,10 +73,6 @@ int fast_floor(double x){
 	return x < xi ? xi - 1 : xi;
 }
 
-/**
-	 * 2D SuperSimplex noise base.
-	 * Lookup table implementation inspired by DigitalShadow.
-	 */
 double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double xs, double ys){
 	double value = 0;
 
@@ -119,9 +115,6 @@ double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global La
 	return value;
 }
 
-/**
-	 * 2D SuperSimplex noise, standard lattice orientation.
-	 */
 __kernel void noise2(
 	__global short* perm,
     __global Grad2* permGrad2,
@@ -145,11 +138,6 @@ __kernel void noise2(
 	}
 }
 
-/**
-	 * 2D SuperSimplex noise, with Y pointing down the main diagonal.
-	 * Might be better for a 2D sandbox style game, where Y is vertical.
-	 * Probably slightly less optimal for heightmaps or continent maps.
-	 */
 __kernel void noise2_XBeforeY(
 	__global short* perm,
     __global Grad2* permGrad2,
@@ -172,12 +160,6 @@ __kernel void noise2_XBeforeY(
 	}
 }
 
-/**
-	 * Generate overlapping cubic lattices for 3D Re-oriented BCC noise.
-	 * Lookup table implementation inspired by DigitalShadow.
-	 * It was actually faster to narrow down the points in the loop itself,
-	 * than to build up the index with enough info to isolate 8 points.
-	 */
 double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global LatticePoint3D* LOOKUP_3D, double xr, double yr, double zr){
 
 	// Get base and offsets inside cube of first lattice.
@@ -221,12 +203,6 @@ double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global Lat
 	return value;
 }
 
-/**
-	 * 3D Re-oriented 8-point BCC noise, classic orientation
-	 * Proper substitute for what 3D SuperSimplex would be,
-	 * in light of Forbidden Formulae.
-	 * Use noise3_XYBeforeZ or noise3_XZBeforeY instead, wherever appropriate.
-	 */
 __kernel void noise3_Classic(
 	__global short* perm,
     __global Grad3* permGrad3,
@@ -255,14 +231,6 @@ __kernel void noise3_Classic(
 	}
 }
 
-/**
-	 * 3D Re-oriented 8-point BCC noise, with better visual isotropy in (X, Y).
-	 * Recommended for 3D terrain and time-varied animations.
-	 * The Z coordinate should always be the "different" coordinate in your use case.
-	 * If Y is vertical in world coordinates, call noise3_XYBeforeZ(x, z, Y) or use noise3_XZBeforeY.
-	 * If Z is vertical in world coordinates, call noise3_XYBeforeZ(x, y, Z).
-	 * For a time varied animation, call noise3_XYBeforeZ(x, y, T).
-	 */
 __kernel void noise3_XYBeforeZ(
 	__global short* perm,
     __global Grad3* permGrad3,
@@ -292,14 +260,6 @@ __kernel void noise3_XYBeforeZ(
 	}
 }
 
-/**
-	 * 3D Re-oriented 8-point BCC noise, with better visual isotropy in (X, Z).
-	 * Recommended for 3D terrain and time-varied animations.
-	 * The Y coordinate should always be the "different" coordinate in your use case.
-	 * If Y is vertical in world coordinates, call noise3_XZBeforeY(x, Y, z).
-	 * If Z is vertical in world coordinates, call noise3_XZBeforeY(x, Z, y) or use noise3_XYBeforeZ.
-	 * For a time varied animation, call noise3_XZBeforeY(x, T, y) or use noise3_XYBeforeZ.
-	 */
 __kernel void noise3_XZBeforeY(
 	__global short* perm,
     __global Grad3* permGrad3,
@@ -329,12 +289,6 @@ __kernel void noise3_XZBeforeY(
 	}
 }
 
-/**
-	 * 4D SuperSimplex noise base.
-	 * Using ultra-simple 4x4x4x4 lookup partitioning.
-	 * This isn't as elegant or SIMD/GPU/etc. portable as other approaches,
-	 * but it does compete performance-wise with optimized OpenSimplex1.
-	 */
 double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global LatticePoint4D* LOOKUP_4D, double xs, double ys, double zs, double ws){
 	const unsigned int sizes[256] = {
 		20, 15, 16, 17, 15, 16, 12, 15, 16, 12, 10, 14, 17, 15, 14,
@@ -425,9 +379,6 @@ double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global La
 	return value;
 }
 
-/**
-	 * 4D SuperSimplex noise, classic lattice orientation.
-	 */
 __kernel void noise4_Classic(
 	__global short* perm,
     __global Grad4* permGrad4,
@@ -455,11 +406,6 @@ __kernel void noise4_Classic(
 	}
 }
 
-/**
-	 * 4D SuperSimplex noise, with XY and ZW forming orthogonal triangular-based planes.
-	 * Recommended for 3D terrain, where X and Y (or Z and W) are horizontal.
-	 * Recommended for noise(x, y, sin(time), cos(time)) trick.
-	 */
 __kernel void noise4_XYBeforeZW(
 	__global short* perm,
     __global Grad4* permGrad4,
@@ -487,10 +433,6 @@ __kernel void noise4_XYBeforeZW(
 	}
 }
 
-/**
-	 * 4D SuperSimplex noise, with XZ and YW forming orthogonal triangular-based planes.
-	 * Recommended for 3D terrain, where X and Z (or Y and W) are horizontal.
-	 */
 __kernel void noise4_XZBeforeYW(
 	__global short* perm,
     __global Grad4* permGrad4,
@@ -518,26 +460,30 @@ __kernel void noise4_XZBeforeYW(
 	}
 }
 
-/**
-	 * 4D SuperSimplex noise, with XYZ oriented like noise3_Classic,
-	 * and W for an extra degree of freedom.
-	 * Recommended for time-varied animations which texture a 3D object (W=time)
-	 */
-/*__kernel void noise4_XYZBeforeW(
+__kernel void noise4_XYZBeforeW(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
 	const unsigned int width,
 	const unsigned int height,
 	__global double* output){
+
 	int index = get_index(width, height);
     if (index >= 0){
+
 		double x = get_x();
-		double y = get_y();
+		double y = 0.0;
+		double z = get_y();
+		double w = 0.0;
+
 		double xyz = x + y + z;
 		double ww = w * 1.118033988749894;
 		double s2 = xyz * -0.16666666666666666 + ww;
-		double xs = x + s2, ys = y + s2, zs = z + s2, ws = -0.5 * xyz + ww;
+		double xs = x + s2;
+		double ys = y + s2;
+		double zs = z + s2;
+		double ws = -0.5 * xyz + ww;
+
 		output[index] = _noise4_Base(perm, permGrad4, LOOKUP_4D, xs, ys, zs, ws);
 	}
-}*/
+}

@@ -436,7 +436,7 @@ void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
 							0x55, 0x59, 0x65, 0x69, 0x6A, 0x95, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA, 0xAE, 0xBA, 0xEA,
 							0x55, 0x56, 0x59, 0x5A, 0x65, 0x66, 0x69, 0x6A, 0x95, 0x96, 0x99, 0x9A, 0xA5, 0xA6, 0xA9, 0xAA, 0xAB, 0xAE, 0xBA, 0xEA};
 
-	LatticePoint4D *latticePoints = (LatticePoint4D *)malloc(sizeof(LatticePoint4D) * 256);
+	LatticePoint4D latticePoints[256];
 	for (cl_int i = 0; i < 256; i++){
 		cl_int cx = ((i >> 0) & 3) - 1;
 		cl_int cy = ((i >> 2) & 3) - 1;
@@ -447,7 +447,6 @@ void _loadLatticePoint4DConstArray(OpenSimplexEnv *ose){
 	for (cl_int i = 0; i < 3476; i++){
 		ose->LOOKUP_4D[i] = latticePoints[indices[i]];
 	}
-	free(latticePoints);
 }
 
 Grad2 _newGrad2(cl_double dx, cl_double dy){
@@ -749,7 +748,7 @@ OpenSimplexEnv *initOpenSimplex(){
 	OpenSimplexEnv *ose = (OpenSimplexEnv*) malloc(sizeof(OpenSimplexEnv));
 	_loadGrad2ConstArray(ose);
 	_loadGrad3ConstArray(ose);
-	_loadGrad3ConstArray(ose);
+	_loadGrad4ConstArray(ose);
 	_loadLatticePoint2DConstArray(ose);
 	_loadLatticePoint3DConstArray(ose);
 	_loadLatticePoint4DConstArray(ose);
