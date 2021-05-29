@@ -6,6 +6,12 @@
 
 
 
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+
+
+
 float get_time_s(struct timeb start, struct timeb end){
 	unsigned long long ms = (unsigned long long)(1000.0 * (end.time - start.time) + (end.millitm - start.millitm));
 	return ms / 1000.0;

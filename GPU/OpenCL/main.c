@@ -1,6 +1,5 @@
 #include "bitmap.h"
 #include "OpenSimplex2S\OpenSimplex2S.h"
-#include "opencl.h"
 
 
 

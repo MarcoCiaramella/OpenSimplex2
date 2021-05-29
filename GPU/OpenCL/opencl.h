@@ -14,7 +14,14 @@ typedef struct {
 	unsigned int height;
 } OpenCLEnv;
 
-OpenSimplexEnv *initOpenSimplex();
-OpenSimplexGradients *newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
 OpenCLEnv initOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
 void releaseOpenCL(OpenCLEnv* openCLEnv);
+double *run_kernel(
+	OpenCLEnv* openCLEnv,
+	char *function,
+	void *host_ptr1,
+	void *host_ptr2,
+	void *host_ptr3,
+	size_t size1,
+	size_t size2,
+	size_t size3);

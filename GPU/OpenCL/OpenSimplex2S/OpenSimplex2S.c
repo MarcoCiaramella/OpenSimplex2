@@ -1,7 +1,6 @@
 #include "OpenSimplex2S.h"
 
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 
 Grad2 *_newGrad2Arr(unsigned int size){
 	return (Grad2 *)malloc(sizeof(Grad2) * size);
