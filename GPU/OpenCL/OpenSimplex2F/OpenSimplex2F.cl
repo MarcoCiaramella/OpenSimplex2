@@ -170,7 +170,7 @@ double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global Lat
 		double dxr = xri + c->dxr, dyr = yri + c->dyr, dzr = zri + c->dzr;
 		double attn = 0.5 - dxr * dxr - dyr * dyr - dzr * dzr;
 		if (attn < 0){
-			index = LOOKUP_3D[index].nextOnFailure;
+			index = c->nextOnFailure;
 		}
 		else{
 			int pxm = (xrb + c->xrv) & PMASK, pym = (yrb + c->yrv) & PMASK, pzm = (zrb + c->zrv) & PMASK;
@@ -179,7 +179,7 @@ double _noise3_BCC(__global short* perm, __global Grad3* permGrad3, __global Lat
 
 			attn *= attn;
 			value += attn * attn * extrapolation;
-			index = LOOKUP_3D[index].nextOnSuccess;
+			index = c->nextOnSuccess;
 		}
 	}
 	return value;

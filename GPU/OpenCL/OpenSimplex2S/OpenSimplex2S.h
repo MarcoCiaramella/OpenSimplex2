@@ -1,3 +1,5 @@
+#define CL_TARGET_OPENCL_VERSION 300
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
 
@@ -57,5 +59,25 @@ typedef struct {
     LatticePoint4D* LOOKUP_4D;
 } OpenSimplexEnv;
 
-OpenSimplexGradients* newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
-OpenSimplexEnv* initOpenSimplex();
+typedef struct {
+    cl_device_id device;
+    cl_context context;
+    cl_program program;
+    cl_command_queue queue;
+    unsigned int width;
+	unsigned int height;
+} OpenCLEnv;
+
+OpenSimplexEnv *initOpenSimplex();
+OpenSimplexGradients *newOpenSimplexGradients(OpenSimplexEnv *ose, cl_long seed);
+OpenCLEnv initOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
+void releaseOpenCL(OpenCLEnv* openCLEnv);
+double *noise2(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise2_XBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise3_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise3_XYBeforeZ(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise3_XZBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise4_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise4_XYBeforeZW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise4_XZBeforeYW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
+double *noise4_XYZBeforeW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg);
