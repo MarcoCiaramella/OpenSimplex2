@@ -5,8 +5,6 @@ GPU implementation in C of [OpenSimplex 2](https://github.com/KdotJPG/OpenSimple
 Make sure you have an OpenCL driver installed.
 ### OpenSimplex2F
 ```c
-/* file test.c */
-
 #include "OpenSimplex2F.h"
 
 #define WIDTH 4096
@@ -15,7 +13,7 @@ Make sure you have an OpenCL driver installed.
 int main(){
      OpenSimplexEnv* ose = initOpenSimplex();
      OpenSimplexGradients* osg = newOpenSimplexGradients(ose, 1234);
-     OpenCLEnv openCLEnv = initOpenCL("OpenSimplex2F/OpenSimplex2F.cl", WIDTH, HEIGHT);
+     OpenCLEnv openCLEnv = initOpenCL("OpenSimplex2F.cl", WIDTH, HEIGHT);
 
      double *output_buffer;
 
