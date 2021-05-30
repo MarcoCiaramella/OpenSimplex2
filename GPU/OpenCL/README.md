@@ -36,8 +36,6 @@ int main(){
 ```
 ### OpenSimplex2S
 ```c
-/* file test.c */
-
 #include "OpenSimplex2S.h"
 
 #define WIDTH 4096
@@ -46,7 +44,7 @@ int main(){
 int main(){
      OpenSimplexEnv* ose = initOpenSimplex();
      OpenSimplexGradients* osg = newOpenSimplexGradients(ose, 1234);
-     OpenCLEnv openCLEnv = initOpenCL("OpenSimplex2S/OpenSimplex2S.cl", WIDTH, HEIGHT);
+     OpenCLEnv openCLEnv = initOpenCL("OpenSimplex2S.cl", WIDTH, HEIGHT);
 
      double *output_buffer;
 
@@ -69,7 +67,13 @@ int main(){
 ## How to compile
 Download the official OpenCL headers [repository](https://github.com/KhronosGroup/OpenCL-Headers)
 ### gcc
-Compiling OpenSimplex2S example:
+Compiling OpenSimplex2F example in test directory:
 ```shell
-gcc *.c /path/to/OpenSimplex2S/*.c -IC:/path/to/OpenCL-Headers -IC:/path/to/OpenSimplex2S -LC:/path/to/OpenCL_lib -lOpenCL -o test.exe
+cd GPU/OpenCL/test
+gcc ../opencl.c ../OpenSimplex2F.c test_OpenSimplex2F.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2F.exe
+```
+Compiling OpenSimplex2S example in test directory:
+```shell
+cd GPU/OpenCL/test
+gcc ../opencl.c ../OpenSimplex2S.c test_OpenSimplex2S.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2S.exe
 ```

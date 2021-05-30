@@ -1,4 +1,4 @@
-#include "..\opencl.h"
+#include "opencl.h"
 
 
 #define PSIZE 2048
