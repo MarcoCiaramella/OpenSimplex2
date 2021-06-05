@@ -137,14 +137,24 @@ int main(){
 ```
 
 ## Performance
-
 Image 4096x4096 on CPU Intel Core i5-4460 3.20GHz
-
-* noise2 1.768000s
-* noise2_XBeforeY 1.753000s
-* noise3_Classic 2.143000s
-* noise3_XYBeforeZ 2.116000s
-* noise3_XZBeforeY 2.170000s
-* noise4_Classic 3.150000s
-* noise4_XYBeforeZW 3.843000s
-* noise4_XZBeforeYW 3.608000s
+### OpenSimplex2F
+* noise2 1.793000s
+* noise2_XBeforeY 1.733000s
+* noise3_Classic 2.108000s
+* noise3_XYBeforeZ 2.111000s
+* noise3_XZBeforeY 2.149000s
+* noise4_Classic 3.126000s
+* noise4_XYBeforeZW 3.423000s
+* noise4_XZBeforeYW 3.234000s
+* noise4_XYZBeforeW 3.155000s
+### OpenSimplex2S
+* noise2 2.162000s
+* noise2_XBeforeY 2.092000s
+* noise3_Classic 2.854000s
+* noise3_XYBeforeZ 2.861000s
+* noise3_XZBeforeY 2.851000s
+* noise4_Classic 5.153000s
+* noise4_XYBeforeZW 5.397000s
+* noise4_XZBeforeYW 5.312000s
+* noise4_XYZBeforeW 4.971000s

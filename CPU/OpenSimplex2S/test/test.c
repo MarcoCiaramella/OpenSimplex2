@@ -6,8 +6,8 @@
 
 
 
-#define WIDTH 512
-#define HEIGHT 512
+#define WIDTH 4096
+#define HEIGHT 4096
 #define PERIOD 64.0
 #define OFF_X 2048
 #define OFF_Y 2048	
