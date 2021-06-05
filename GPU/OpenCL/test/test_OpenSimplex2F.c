@@ -12,7 +12,7 @@
 int main(){
      OpenSimplexEnv* ose = initOpenSimplex();
      OpenSimplexGradients* osg = newOpenSimplexGradients(ose, 1234);
-     OpenCLEnv openCLEnv = initOpenCL("../OpenSimplex2F.cl", WIDTH, HEIGHT);
+     OpenCLEnv openCLEnv = loadOpenCL("../OpenSimplex2F.cl", WIDTH, HEIGHT);
 
      double *output_buffer;
 

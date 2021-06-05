@@ -14,7 +14,7 @@ typedef struct {
 	unsigned int height;
 } OpenCLEnv;
 
-OpenCLEnv initOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
+OpenCLEnv loadOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
 void releaseOpenCL(OpenCLEnv* openCLEnv);
 double *run_kernel(
 	OpenCLEnv* openCLEnv,

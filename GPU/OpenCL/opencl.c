@@ -2,6 +2,7 @@
 #include <sys/timeb.h>
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 
 
@@ -351,7 +352,7 @@ double *run_kernel(
 	return output_buffer;
 }
 
-OpenCLEnv initOpenCL(char *kernel_filename, unsigned int width, unsigned int height){
+OpenCLEnv loadOpenCL(char *kernel_filename, unsigned int width, unsigned int height){
 
 	OpenCLEnv openCLEnv;
 	cl_context context;
