@@ -1,5 +1,5 @@
 # OpenSimplex2
-C implementation for CPU.
+C implementation for CPU
 
 ## How to use
 ```c

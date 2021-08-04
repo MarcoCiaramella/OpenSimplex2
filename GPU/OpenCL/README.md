@@ -1,5 +1,5 @@
 # OpenSimplex2
-C implementation for GPU using OpenCL.
+C implementation for GPU using OpenCL
 
 ## How to use
 Make sure you have an OpenCL driver installed.
