@@ -1,5 +1,5 @@
 # OpenSimplex2
-GPU implementation in C of [OpenSimplex 2](https://github.com/KdotJPG/OpenSimplex2)
+C implementation for GPU.
 
 ## How to use
 Make sure you have an OpenCL driver installed.
