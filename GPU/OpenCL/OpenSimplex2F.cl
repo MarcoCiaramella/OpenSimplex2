@@ -2,8 +2,7 @@
 #define PMASK 2047
 #define PERIOD 64.0
 #define OFF_X 2048
-#define OFF_Y 2048
-#define OFF_Z 2048
+#define OFF_Y 2048	
 #define FREQ 1.0 / PERIOD
 
 
@@ -54,15 +53,17 @@ int get_index(const unsigned int width, const unsigned int height){
 }
 
 double get_x(){
-	return (get_global_id(0) + OFF_X) * FREQ;
+	int x = get_global_id(0);
+	return (x + OFF_X) * FREQ;
 }
 
 double get_y(){
-	return (get_global_id(1) + OFF_Y) * FREQ;
+	int y = get_global_id(1);
+	return (y + OFF_Y) * FREQ;
 }
 
 double get_z(){
-	return (get_global_id(2) + OFF_Z) * FREQ;
+	return 0.0;
 }
 
 double get_w(){
