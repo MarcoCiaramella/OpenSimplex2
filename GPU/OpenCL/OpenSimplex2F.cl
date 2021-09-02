@@ -53,13 +53,11 @@ int get_index(const unsigned int width, const unsigned int height){
 }
 
 double get_x(){
-	int x = get_global_id(0);
-	return (x + OFF_X) * FREQ;
+	return (get_global_id(0) + OFF_X) * FREQ;
 }
 
 double get_y(){
-	int y = get_global_id(1);
-	return (y + OFF_Y) * FREQ;
+	return (get_global_id(1) + OFF_Y) * FREQ;
 }
 
 double get_z(){
