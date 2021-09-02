@@ -2,7 +2,8 @@
 #define PMASK 2047
 #define PERIOD 64.0
 #define OFF_X 2048
-#define OFF_Y 2048	
+#define OFF_Y 2048
+#define OFF_Z 2048
 #define FREQ 1.0 / PERIOD
 
 
@@ -61,7 +62,7 @@ double get_y(){
 }
 
 double get_z(){
-	return 0.0;
+	return (get_global_id(2) + OFF_Z) * FREQ;
 }
 
 double get_w(){
