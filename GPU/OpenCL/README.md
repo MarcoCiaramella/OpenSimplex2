@@ -65,13 +65,13 @@ int main(){
 ## How to compile
 Download the official OpenCL headers [repository](https://github.com/KhronosGroup/OpenCL-Headers)
 ### gcc
-Compiling OpenSimplex2F example in [test](https://github.com/MarcoCiaramella/OpenSimplex2/tree/main/GPU/OpenCL/test) directory:
+Compiling OpenSimplex2F example:
 ```shell
-cd GPU/OpenCL/test && gcc ../opencl.c ../OpenSimplex2F.c test_OpenSimplex2F.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2F.exe
+cd GPU/OpenCL/test ; gcc ../opencl.c ../OpenSimplex2F.c test_OpenSimplex2F.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2F.exe
 ```
-Compiling OpenSimplex2S example in [test](https://github.com/MarcoCiaramella/OpenSimplex2/tree/main/GPU/OpenCL/test) directory:
+Compiling OpenSimplex2S example:
 ```shell
-cd GPU/OpenCL/test && gcc ../opencl.c ../OpenSimplex2S.c test_OpenSimplex2S.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2S.exe
+cd GPU/OpenCL/test ; gcc ../opencl.c ../OpenSimplex2S.c test_OpenSimplex2S.c bitmap.c -IC:/path/to/OpenCL-Headers -LC:/path/to/OpenCL_lib -lOpenCL -o test_OpenSimplex2S.exe
 ```
 
 ## Performance
