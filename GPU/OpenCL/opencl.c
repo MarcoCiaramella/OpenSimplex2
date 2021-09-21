@@ -258,8 +258,7 @@ cl_uint get_num_dimensions(cl_device_id device){
 	return num_dimensions;
 }
 
-size_t *get_max_num_work_item(cl_device_id device, cl_uint num_dimensions)
-{
+size_t *get_max_num_work_item(cl_device_id device, cl_uint num_dimensions){
 	size_t n = sizeof(size_t) * num_dimensions;
 	size_t *max_num_work_item = (size_t *)malloc(n);
 	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, n, max_num_work_item, NULL);
