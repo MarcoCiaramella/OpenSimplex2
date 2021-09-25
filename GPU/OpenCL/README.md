@@ -1,5 +1,8 @@
 # OpenSimplex2
-C implementation for GPU using OpenCL
+C implementation for GPU using OpenCL.
+
+## Note
+The library in this early version generates a 2D noise over a grid WIDTH x HEIGHT so you can use the result as image only (for example as a heightmap).
 
 ## How to use
 Make sure you have an OpenCL driver installed.
