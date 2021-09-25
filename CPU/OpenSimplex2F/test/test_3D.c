@@ -25,15 +25,14 @@ typedef struct {
 
 
 
-void generate_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, mesh m){
+mesh add_noise(OpenSimplexEnv *ose, OpenSimplexGradients *osg, mesh m, double (*noise_fun)(OpenSimplexEnv*, OpenSimplexGradients*, double, double, double)){
     for (int i = 0; i < m.num_vertices; i++){
         int j = i*3;
         float vx = m.vertices[j];
         float vy = m.vertices[j+1];
         float vz = m.vertices[j+2];
-        float noise = noise3_Classic(ose, osg, (vx + OFF_X) * FREQ, (vy + OFF_Y) * FREQ, (vz + OFF_Z) * FREQ);
+        float noise = noise_fun(ose, osg, (vx + OFF_X) * FREQ, (vy + OFF_Y) * FREQ, (vz + OFF_Z) * FREQ);
         noise = (noise+1.0)/2.0;
-        //float noise = noise3_Classic(ose, osg, (vx + OFF_X) * FREQ, 0.0, (vy + OFF_Y) * FREQ);
         float nx = m.normals[j];
         float ny = m.normals[j+1];
         float nz = m.normals[j+2];
@@ -41,28 +40,7 @@ void generate_noise3_Classic(OpenSimplexEnv *ose, OpenSimplexGradients *osg, mes
         m.vertices[j+1] = vy + ny*noise;
         m.vertices[j+2] = vz + nz*noise;
     }
-}
-
-double **generate_noise3_XYBeforeZ(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-    double **noise = (double **) malloc(sizeof(double *) * HEIGHT);
-    for (int y = 0; y < HEIGHT; y++){
-        noise[y] = (double *) malloc(sizeof(double) * WIDTH);
-        for (int x = 0; x < WIDTH; x++){
-            noise[y][x] = noise3_XYBeforeZ(ose, osg, (x + OFF_X) * FREQ, 0.0, (y + OFF_Y) * FREQ);
-        }
-    }
-    return noise;
-}
-
-double **generate_noise3_XZBeforeY(OpenSimplexEnv *ose, OpenSimplexGradients *osg){
-    double **noise = (double **) malloc(sizeof(double *) * HEIGHT);
-    for (int y = 0; y < HEIGHT; y++){
-        noise[y] = (double *) malloc(sizeof(double) * WIDTH);
-        for (int x = 0; x < WIDTH; x++){
-            noise[y][x] = noise3_XZBeforeY(ose, osg, (x + OFF_X) * FREQ, 0.0, (y + OFF_Y) * FREQ);
-        }
-    }
-    return noise;
+    return m;
 }
 
 // sectorCount;                        // longitude, # of slices
@@ -204,9 +182,8 @@ void export_mesh_ply(const char* ply_filename, const mesh m){
 int main(){
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
-    mesh sphere = new_sphere(2, 512, 512);
-    //export_mesh_ply("sphere.ply", sphere);
-    generate_noise3_Classic(ose, osg, sphere);
-    export_mesh_ply("sphere_noise.ply", sphere);
+    export_mesh_ply("sphere_noise3_Classic.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_Classic));
+    export_mesh_ply("sphere_noise3_XYBeforeZ.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_XYBeforeZ));
+    export_mesh_ply("sphere_noise3_XZBeforeY.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_XZBeforeY));
     return 0;
 }
