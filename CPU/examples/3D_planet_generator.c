@@ -1,17 +1,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../OpenSimplex2F.h"
+#include "../OpenSimplex2F/OpenSimplex2F.h"
 
 
 
-#define WIDTH 4096
-#define HEIGHT 4096
-#define PERIOD 1.0
+#define SIZE 512
 #define OFF_X 2048
 #define OFF_Y 2048
 #define OFF_Z 2048
-#define FREQ 1.0 / PERIOD
+#define FREQ1 1.0
+#define FREQ2 2.0
+#define FREQ4 4.0
+#define FREQ8 8.0
+#define FREQ16 16.0
+#define FREQ32 32.0
+#define OCT1 0.9
+#define OCT2 0.6
+#define OCT4 0.5
+#define OCT8 0.3
+#define OCT16 0.2
+#define OCT32 0.1
+#define EXP 3.0
 
 
 typedef struct {
@@ -28,11 +38,22 @@ typedef struct {
 mesh add_noise(OpenSimplexEnv *ose, OpenSimplexGradients *osg, mesh m, double (*noise_fun)(OpenSimplexEnv*, OpenSimplexGradients*, double, double, double)){
     for (int i = 0; i < m.num_vertices; i++){
         int j = i*3;
+
         float vx = m.vertices[j];
         float vy = m.vertices[j+1];
         float vz = m.vertices[j+2];
-        float noise = noise_fun(ose, osg, (vx + OFF_X) * FREQ, (vy + OFF_Y) * FREQ, (vz + OFF_Z) * FREQ);
-        noise = (noise+1.0)/2.0;
+
+        float noise1 = noise_fun(ose, osg, (vx + OFF_X) * FREQ1, (vy + OFF_Y) * FREQ1, (vz + OFF_Z) * FREQ1);
+        float noise2 = noise_fun(ose, osg, (vx + OFF_X) * FREQ2, (vy + OFF_Y) * FREQ2, (vz + OFF_Z) * FREQ2);
+        float noise4 = noise_fun(ose, osg, (vx + OFF_X) * FREQ4, (vy + OFF_Y) * FREQ4, (vz + OFF_Z) * FREQ4);
+        float noise8 = noise_fun(ose, osg, (vx + OFF_X) * FREQ8, (vy + OFF_Y) * FREQ8, (vz + OFF_Z) * FREQ8);
+        float noise16 = noise_fun(ose, osg, (vx + OFF_X) * FREQ16, (vy + OFF_Y) * FREQ16, (vz + OFF_Z) * FREQ16);
+        float noise32 = noise_fun(ose, osg, (vx + OFF_X) * FREQ32, (vy + OFF_Y) * FREQ32, (vz + OFF_Z) * FREQ32);
+
+        float noise = (OCT1*noise1 + OCT2*noise2 + OCT4*noise4 + OCT8*noise8 + OCT16*noise16 + OCT32*noise32 + 1.0) / 2.0;
+        noise /= OCT1 + OCT2 + OCT4 + OCT8 + OCT16 + OCT32;
+        noise = pow(noise, EXP);
+
         float nx = m.normals[j];
         float ny = m.normals[j+1];
         float nz = m.normals[j+2];
@@ -182,8 +203,8 @@ void export_mesh_ply(const char* ply_filename, const mesh m){
 int main(){
     OpenSimplexEnv *ose = initOpenSimplex();
     OpenSimplexGradients *osg = newOpenSimplexGradients(ose, 1234);
-    export_mesh_ply("sphere_noise3_Classic.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_Classic));
-    export_mesh_ply("sphere_noise3_XYBeforeZ.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_XYBeforeZ));
-    export_mesh_ply("sphere_noise3_XZBeforeY.ply", add_noise(ose, osg, new_sphere(2, 512, 512), noise3_XZBeforeY));
+    export_mesh_ply("planet_noise3_Classic.ply", add_noise(ose, osg, new_sphere(2, SIZE, SIZE), noise3_Classic));
+    export_mesh_ply("planet_noise3_XYBeforeZ.ply", add_noise(ose, osg, new_sphere(2, SIZE, SIZE), noise3_XYBeforeZ));
+    export_mesh_ply("planet_noise3_XZBeforeY.ply", add_noise(ose, osg, new_sphere(2, SIZE, SIZE), noise3_XZBeforeY));
     return 0;
 }
