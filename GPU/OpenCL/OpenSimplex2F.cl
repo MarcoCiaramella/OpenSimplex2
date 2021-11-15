@@ -1,13 +1,4 @@
-//#define PSIZE 2048
 #define PMASK 2047
-//#define PERIOD 64.0
-//#define OFF_X 2048
-//#define OFF_Y 2048
-//#define OFF_Z 2048
-//#define OFF_W 2048
-//#define FREQ 1.0 / PERIOD
-
-
 
 
 
@@ -53,22 +44,20 @@ int get_index(const unsigned int size, const unsigned int dimensions){
 	return -1;
 }
 
-double get_x(){
-	int x = get_global_id(0);
-	return (x + OFF_X) * FREQ;
+double get_x(double* buffer, int index, const unsigned int dimensions){
+	return buffer[index*dimensions];
 }
 
-double get_y(){
-	int y = get_global_id(1);
-	return (y + OFF_Y) * FREQ;
+double get_y(double* buffer, int index, const unsigned int dimensions){
+	return buffer[index*dimensions + 1];
 }
 
-double get_z(){
-	return 0.0;
+double get_z(double* buffer, int index, const unsigned int dimensions){
+	return buffer[index*dimensions + 2];
 }
 
-double get_w(){
-	return 0.0;
+double get_w(double* buffer, int index, const unsigned int dimensions){
+	return buffer[index*dimensions + 3];
 }
 
 int fast_floor(double x){
@@ -113,15 +102,15 @@ __kernel void noise2(
 	__global short* perm,
     __global Grad2* permGrad2,
     __global LatticePoint2D* LOOKUP_2D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 2);
     if (index >= 0){
 
-		double x = get_x();
-		double y = get_y();
+		double x = get_x(input, index, 2);
+		double y = get_y(input, index, 2);
 
 		// Get points for A2* lattice
 		double s = 0.366025403784439 * (x + y);
@@ -135,15 +124,15 @@ __kernel void noise2_XBeforeY(
 	__global short* perm,
     __global Grad2* permGrad2,
     __global LatticePoint2D* LOOKUP_2D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 2);
     if (index >= 0){
 
-		double x = get_x();
-		double y = get_y();
+		double x = get_x(input, index, 2);
+		double y = get_y(input, index, 2);
 
 		// Skew transform and rotation baked into one.
 		double xx = x * 0.7071067811865476;
@@ -190,16 +179,16 @@ __kernel void noise3_Classic(
 	__global short* perm,
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 3);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = get_y();
-		double z = get_z();
+		double x = get_x(input, index, 3);
+		double y = get_y(input, index, 3);
+		double z = get_z(input, index, 3);
 
 		// Re-orient the cubic lattices via rotation, to produce the expected look on cardinal planar slices.
 		// If texturing objects that don't tend to have cardinal plane faces, you could even remove this.
@@ -216,16 +205,16 @@ __kernel void noise3_XYBeforeZ(
 	__global short* perm,
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 3);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = get_y();
-		double z = get_z();
+		double x = get_x(input, index, 3);
+		double y = get_y(input, index, 3);
+		double z = get_z(input, index, 3);
 
 		// Re-orient the cubic lattices without skewing, to make X and Y triangular like 2D.
 		// Orthonormal rotation. Not a skew transform.
@@ -244,16 +233,16 @@ __kernel void noise3_XZBeforeY(
 	__global short* perm,
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 3);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = get_y();
-		double z = get_z();
+		double x = get_x(input, index, 3);
+		double y = get_y(input, index, 3);
+		double z = get_z(input, index, 3);
 
 		// Re-orient the cubic lattices without skewing, to make X and Z triangular like 2D.
 		// Orthonormal rotation. Not a skew transform.
@@ -423,17 +412,17 @@ __kernel void noise4_Classic(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* VERTICES_4D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 4);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = 0.0;
-		double z = get_y();
-		double w = 0.0;
+		double x = get_x(input, index, 4);
+		double y = get_y(input, index, 4);
+		double z = get_z(input, index, 4);
+		double w = get_w(input, index, 4);
 
 		// Get points for A4 lattice
 		double s = -0.138196601125011 * (x + y + z + w);
@@ -447,17 +436,17 @@ __kernel void noise4_XYBeforeZW(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* VERTICES_4D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 4);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = 0.0;
-		double z = get_y();
-		double w = 0.0;
+		double x = get_x(input, index, 4);
+		double y = get_y(input, index, 4);
+		double z = get_z(input, index, 4);
+		double w = get_w(input, index, 4);
 
 		double s2 = (x + y) * -0.178275657951399372 + (z + w) * 0.215623393288842828;
 		double t2 = (z + w) * -0.403949762580207112 + (x + y) * -0.375199083010075342;
@@ -471,17 +460,17 @@ __kernel void noise4_XZBeforeYW(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* VERTICES_4D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 4);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = 0.0;
-		double z = get_y();
-		double w = 0.0;
+		double x = get_x(input, index, 4);
+		double y = get_y(input, index, 4);
+		double z = get_z(input, index, 4);
+		double w = get_w(input, index, 4);
 
 		double s2 = (x + z) * -0.178275657951399372 + (y + w) * 0.215623393288842828;
 		double t2 = (y + w) * -0.403949762580207112 + (x + z) * -0.375199083010075342;
@@ -495,17 +484,17 @@ __kernel void noise4_XYZBeforeW(
 	__global short* perm,
     __global Grad4* permGrad4,
     __global LatticePoint4D* VERTICES_4D,
-	const unsigned int width,
-	const unsigned int height,
+	__global double* input,
+	const unsigned int size,
 	__global double* output){
 
-	int index = get_index(width, height);
+	int index = get_index(size, 4);
     if (index >= 0){
 		
-		double x = get_x();
-		double y = 0.0;
-		double z = get_y();
-		double w = 0.0;
+		double x = get_x(input, index, 4);
+		double y = get_y(input, index, 4);
+		double z = get_z(input, index, 4);
+		double w = get_w(input, index, 4);
 
 		double xyz = x + y + z;
 		double ww = w * 0.2236067977499788;

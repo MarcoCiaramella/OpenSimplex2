@@ -287,9 +287,11 @@ double *run_kernel(
 	void *host_ptr1,
 	void *host_ptr2,
 	void *host_ptr3,
+	double* input_buffer,
 	size_t size1,
 	size_t size2,
-	size_t size3){
+	size_t size3,
+	size_t size_input_buffer){
 
 	cl_mem device_par1_buffer;
 	cl_mem device_par2_buffer;
