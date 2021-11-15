@@ -1,9 +1,11 @@
-#define PSIZE 2048
+//#define PSIZE 2048
 #define PMASK 2047
-#define PERIOD 64.0
-#define OFF_X 2048
-#define OFF_Y 2048	
-#define FREQ 1.0 / PERIOD
+//#define PERIOD 64.0
+//#define OFF_X 2048
+//#define OFF_Y 2048
+//#define OFF_Z 2048
+//#define OFF_W 2048
+//#define FREQ 1.0 / PERIOD
 
 
 
@@ -43,11 +45,10 @@ typedef struct {
 
 
 
-int get_index(const unsigned int width, const unsigned int height){
-	int x = get_global_id(0);
-	int y = get_global_id(1);
-	if (x < width && y < height){
-		return y*width + x;
+int get_index(const unsigned int size, const unsigned int dimensions){
+	int index = get_global_id(0);
+	if (index*dimensions + dimensions < size){
+		return index;
 	}
 	return -1;
 }
