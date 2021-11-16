@@ -301,14 +301,15 @@ double *run_kernel(
 	struct timeb start, end;
 	cl_int errcode_ret;
 	cl_kernel kernel;
+	size_t num_elements = size_input_buffer / sizeof(double);
 
 	ftime(&start);
 
 	kernel = clCreateKernel(openCLEnv->program, function, &errcode_ret);
 	size_t local_work_size = get_local_work_size(kernel, openCLEnv->device);
-	size_t global_work_size = get_global_work_size(local_work_size, num_points(size_input_buffer, dimensions));
+	size_t global_work_size = get_global_work_size(local_work_size, num_points(num_elements, dimensions));
 
-	output_size = num_points(size_input_buffer, dimensions) * sizeof(double);
+	output_size = num_points(num_elements, dimensions) * sizeof(double);
 	output_buffer = (double *)malloc(output_size);
 
 	device_par1_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size1, host_ptr1, NULL);
@@ -326,7 +327,7 @@ double *run_kernel(
 	clSetKernelArg(kernel, 1, sizeof(cl_mem), &device_par2_buffer);
 	clSetKernelArg(kernel, 2, sizeof(cl_mem), &device_par3_buffer);
 	clSetKernelArg(kernel, 3, sizeof(cl_mem), &device_input_buffer);
-	clSetKernelArg(kernel, 4, sizeof(unsigned int), &size_input_buffer);
+	clSetKernelArg(kernel, 4, sizeof(unsigned int), &num_elements);
 	clSetKernelArg(kernel, 5, sizeof(cl_mem), &device_output_buffer);
 
 	res = clEnqueueNDRangeKernel(openCLEnv->queue, kernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
