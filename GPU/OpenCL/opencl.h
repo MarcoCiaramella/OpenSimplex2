@@ -12,7 +12,7 @@ typedef struct {
     cl_command_queue queue;
 } OpenCLEnv;
 
-OpenCLEnv loadOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
+OpenCLEnv loadOpenCL(char *kernel_filename);
 void releaseOpenCL(OpenCLEnv* openCLEnv);
 double *run_kernel(
 	OpenCLEnv* openCLEnv,
@@ -20,6 +20,9 @@ double *run_kernel(
 	void *host_ptr1,
 	void *host_ptr2,
 	void *host_ptr3,
+	double* input_buffer,
 	size_t size1,
 	size_t size2,
-	size_t size3);
+	size_t size3,
+	size_t size_input_buffer,
+	unsigned int dimensions);

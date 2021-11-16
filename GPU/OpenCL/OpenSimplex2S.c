@@ -785,7 +785,8 @@ double *noise2(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *
 		sizeof(osg->perm),
 		sizeof(osg->permGrad2),
 		sizeof(ose->LOOKUP_2D),
-		size_input_buffer);
+		size_input_buffer,
+		2);
 }
 
 double *noise2_XBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -799,7 +800,8 @@ double *noise2_XBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGr
 		sizeof(osg->perm),
 		sizeof(osg->permGrad2),
 		sizeof(ose->LOOKUP_2D),
-		size_input_buffer);
+		size_input_buffer,
+		2);
 }
 
 double *noise3_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -813,7 +815,8 @@ double *noise3_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGra
 		sizeof(osg->perm),
 		sizeof(osg->permGrad3),
 		sizeof(ose->LOOKUP_3D),
-		size_input_buffer);
+		size_input_buffer,
+		3);
 }
 
 double *noise3_XYBeforeZ(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -827,7 +830,8 @@ double *noise3_XYBeforeZ(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexG
 		sizeof(osg->perm),
 		sizeof(osg->permGrad3),
 		sizeof(ose->LOOKUP_3D),
-		size_input_buffer);
+		size_input_buffer,
+		3);
 }
 
 double *noise3_XZBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -841,7 +845,8 @@ double *noise3_XZBeforeY(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexG
 		sizeof(osg->perm),
 		sizeof(osg->permGrad3),
 		sizeof(ose->LOOKUP_3D),
-		size_input_buffer);
+		size_input_buffer,
+		3);
 }
 
 double *noise4_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -855,7 +860,8 @@ double *noise4_Classic(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGra
 		sizeof(osg->perm),
 		sizeof(osg->permGrad4),
 		sizeof(ose->LOOKUP_4D),
-		size_input_buffer);
+		size_input_buffer,
+		4);
 }
 
 double *noise4_XYBeforeZW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -869,7 +875,8 @@ double *noise4_XYBeforeZW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplex
 		sizeof(osg->perm),
 		sizeof(osg->permGrad4),
 		sizeof(ose->LOOKUP_4D),
-		size_input_buffer);
+		size_input_buffer,
+		4);
 }
 
 double *noise4_XZBeforeYW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -883,7 +890,8 @@ double *noise4_XZBeforeYW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplex
 		sizeof(osg->perm),
 		sizeof(osg->permGrad4),
 		sizeof(ose->LOOKUP_4D),
-		size_input_buffer);
+		size_input_buffer,
+		4);
 }
 
 double *noise4_XYZBeforeW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplexGradients *osg, double* input_buffer, size_t size_input_buffer){
@@ -897,5 +905,6 @@ double *noise4_XYZBeforeW(OpenCLEnv* openCLEnv, OpenSimplexEnv *ose, OpenSimplex
 		sizeof(osg->perm),
 		sizeof(osg->permGrad4),
 		sizeof(ose->LOOKUP_4D),
-		size_input_buffer);
+		size_input_buffer,
+		4);
 }
