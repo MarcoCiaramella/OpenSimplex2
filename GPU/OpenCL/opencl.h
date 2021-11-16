@@ -10,8 +10,6 @@ typedef struct {
     cl_context context;
     cl_program program;
     cl_command_queue queue;
-    unsigned int width;
-	unsigned int height;
 } OpenCLEnv;
 
 OpenCLEnv loadOpenCL(char *kernel_filename, unsigned int width, unsigned int height);
