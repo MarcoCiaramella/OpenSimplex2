@@ -265,20 +265,16 @@ size_t *get_max_num_work_item(cl_device_id device, cl_uint num_dimensions){
 	return max_num_work_item;
 }
 
-size_t *get_local_work_size(cl_kernel kernel, cl_device_id device){
-	size_t *max_num_work_item = get_max_num_work_item(device, get_num_dimensions(device));
-	size_t work_group_size = get_work_group_size(kernel, device);
-	size_t *local_work_size = (size_t *)malloc(sizeof(size_t) * 2);
-	local_work_size[0] = MIN(floor(sqrt(work_group_size)), max_num_work_item[0]);
-	local_work_size[1] = MIN(floor(sqrt(work_group_size)), max_num_work_item[1]);
-	return local_work_size;
+size_t get_local_work_size(cl_kernel kernel, cl_device_id device){
+	return MIN(get_work_group_size(kernel, device), get_max_num_work_item(device, get_num_dimensions(device))[0]);
 }
 
-size_t *get_global_work_size(size_t *local_work_size, int width, int height){
-	size_t *global_work_size = (size_t *)malloc(sizeof(size_t) * 2);
-	global_work_size[0] = ceil(width / (cl_double)local_work_size[0]) * local_work_size[0];
-	global_work_size[1] = ceil(height / (cl_double)local_work_size[1]) * local_work_size[1];
-	return global_work_size;
+size_t get_global_work_size(size_t local_work_size, size_t size){
+	return ceil(size / (cl_double)local_work_size) * local_work_size;
+}
+
+size_t num_points(size_t size, unsigned int dimensions){
+	return size/dimensions;
 }
 
 double *run_kernel(
@@ -309,10 +305,10 @@ double *run_kernel(
 	ftime(&start);
 
 	kernel = clCreateKernel(openCLEnv->program, function, &errcode_ret);
-	size_t *local_work_size = get_local_work_size(kernel, openCLEnv->device);
-	size_t *global_work_size = get_global_work_size(local_work_size, openCLEnv->width, openCLEnv->height);
+	size_t local_work_size = get_local_work_size(kernel, openCLEnv->device);
+	size_t global_work_size = get_global_work_size(local_work_size, num_points(size_input_buffer, dimensions));
 
-	output_size = size_input_buffer/dimensions * sizeof(double);
+	output_size = num_points(size_input_buffer, dimensions) * sizeof(double);
 	output_buffer = (double *)malloc(output_size);
 
 	device_par1_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size1, host_ptr1, NULL);
@@ -333,7 +329,7 @@ double *run_kernel(
 	clSetKernelArg(kernel, 4, sizeof(unsigned int), &size_input_buffer);
 	clSetKernelArg(kernel, 5, sizeof(cl_mem), &device_output_buffer);
 
-	res = clEnqueueNDRangeKernel(openCLEnv->queue, kernel, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
+	res = clEnqueueNDRangeKernel(openCLEnv->queue, kernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, NULL);
 	print_error(res);
 	clFinish(openCLEnv->queue);
 
@@ -347,6 +343,7 @@ double *run_kernel(
 	clReleaseMemObject(device_par1_buffer);
 	clReleaseMemObject(device_par2_buffer);
 	clReleaseMemObject(device_par3_buffer);
+	clReleaseMemObject(device_input_buffer);
 	clReleaseMemObject(device_output_buffer);
 	clReleaseKernel(kernel);
 
