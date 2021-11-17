@@ -5,6 +5,7 @@
 
 #define WIDTH 4096
 #define HEIGHT 4096
+#define SIZE WIDTH*HEIGHT
 
 
 double* new_grid2D(size_t num_points, size_t* size){
@@ -22,14 +23,14 @@ double* new_grid2D(size_t num_points, size_t* size){
 int main(){
      OpenSimplexEnv* ose = initOpenSimplex();
      OpenSimplexGradients* osg = newOpenSimplexGradients(ose, 1234);
-     OpenCLEnv openCLEnv = loadOpenCL("../OpenSimplex2F.cl", WIDTH, HEIGHT);
+     OpenCLEnv openCLEnv = loadOpenCL("../OpenSimplex2F.cl");
 
      double *output_buffer;
      size_t size_input_buffer;
 
-     output_buffer = noise2(&openCLEnv, ose, osg, new_grid2D(8*8, &size_input_buffer), size_input_buffer);
+     output_buffer = noise2(&openCLEnv, ose, osg, new_grid2D(SIZE, &size_input_buffer), size_input_buffer);
      save_bitmap("OpenSimplex2F_noise2.bmp", WIDTH, HEIGHT, output_buffer);
-     output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, new_grid2D(8*8, &size_input_buffer), size_input_buffer);
+     output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, new_grid2D(SIZE, &size_input_buffer), size_input_buffer);
      save_bitmap("OpenSimplex2F_noise2_XBeforeY.bmp", WIDTH, HEIGHT, output_buffer);
      /*output_buffer = noise3_Classic(&openCLEnv, ose, osg);
      save_bitmap("OpenSimplex2F_noise3_Classic.bmp", WIDTH, HEIGHT, output_buffer);
