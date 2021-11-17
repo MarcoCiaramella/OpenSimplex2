@@ -9,6 +9,8 @@
 #define TIME 64
 #define OFF_X 2048
 #define OFF_Y 2048
+#define OFF_Z 2048
+#define OFF_W 2048
 #define PERIOD 64.0
 #define FREQ 1.0 / PERIOD
 
@@ -20,8 +22,8 @@ double* new_grid2D(size_t* size){
      int i = 0;
      for (int y = 0; y < HEIGHT; y++){
           for (int x = 0; x < WIDTH; x++){
-               grid[i++] = x;
-               grid[i++] = y;
+               grid[i++] = (x + OFF_X) * FREQ;
+               grid[i++] = (y + OFF_Y) * FREQ;
           }
      }
      return grid;
@@ -35,9 +37,9 @@ double* new_grid3D(size_t* size){
      for (int z = 0; z < DEPTH; z++){
           for (int y = 0; y < HEIGHT; y++){
                for (int x = 0; x < WIDTH; x++){
-                    grid[i++] = x;
-                    grid[i++] = y;
-                    grid[i++] = z;
+                    grid[i++] = (x + OFF_X) * FREQ;
+                    grid[i++] = (y + OFF_Y) * FREQ;
+                    grid[i++] = (z + OFF_Z) * FREQ;
                }
           }
      }
@@ -52,10 +54,10 @@ double* new_grid4D(size_t* size){
           for (int z = 0; z < DEPTH; z++){
                for (int y = 0; y < HEIGHT; y++){
                     for (int x = 0; x < WIDTH; x++){
-                         grid[i++] = x;
-                         grid[i++] = y;
-                         grid[i++] = z;
-                         grid[i++] = w;
+                         grid[i++] = (x + OFF_X) * FREQ;
+                         grid[i++] = (y + OFF_Y) * FREQ;
+                         grid[i++] = (z + OFF_Z) * FREQ;
+                         grid[i++] = (w + OFF_W) * FREQ;
                     }
                }
           }
