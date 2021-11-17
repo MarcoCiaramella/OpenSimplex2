@@ -27,9 +27,10 @@ int main(){
      double *output_buffer;
      size_t size_input_buffer;
 
-     output_buffer = noise2(&openCLEnv, ose, osg, new_grid2D(SIZE, &size_input_buffer), size_input_buffer);
+     double* grid = new_grid2D(SIZE, &size_input_buffer);
+     output_buffer = noise2(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2S_noise2.bmp", WIDTH, HEIGHT, output_buffer);
-     output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, new_grid2D(SIZE, &size_input_buffer), size_input_buffer);
+     output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2S_noise2_XBeforeY.bmp", WIDTH, HEIGHT, output_buffer);
      /*output_buffer = noise3_Classic(&openCLEnv, ose, osg);
      save_bitmap("OpenSimplex2S_noise3_Classic.bmp", WIDTH, HEIGHT, output_buffer);
