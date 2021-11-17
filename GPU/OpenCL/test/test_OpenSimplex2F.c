@@ -5,15 +5,17 @@
 
 #define WIDTH 8
 #define HEIGHT 8
-#define SIZE WIDTH*HEIGHT
 
 
-double* new_grid2D(size_t num_points, size_t* size){
+double* new_grid2D(size_t* size){
+     size_t num_points = WIDTH*HEIGHT;
      *size = num_points * 2 * sizeof(double);
      double* grid = (double*) malloc(*size);
      for (int i = 0; i < num_points; i++){
-          grid[i] = 0;
-          grid[i++] = 0;
+          double x = i % WIDTH;
+          double y = i / WIDTH;
+          grid[i*2] = x;
+          grid[i*2+1] = y;
      }
      return grid;
 }
@@ -28,7 +30,7 @@ int main(){
      double *output_buffer;
      size_t size_input_buffer;
 
-     double* grid = new_grid2D(SIZE, &size_input_buffer);
+     double* grid = new_grid2D(&size_input_buffer);
      output_buffer = noise2(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2F_noise2.bmp", WIDTH, HEIGHT, output_buffer);
      output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
