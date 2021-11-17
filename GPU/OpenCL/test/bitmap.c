@@ -85,7 +85,7 @@ void generateBitmapImage(unsigned char *image, int height, int width, FILE *imag
     }
 }
 
-unsigned char *create_bitmap(int size, double *vals){
+unsigned char *create_bitmap(double *vals, int size){
     unsigned char *image = (unsigned char *) malloc(sizeof(unsigned char) * size * BYTES_PER_PIXEL);
     int index = 0;
     for (int i = 0; i < size; i++) {
@@ -99,8 +99,8 @@ unsigned char *create_bitmap(int size, double *vals){
     return image;
 }
 
-char *save_bitmap(char *filename, int width, int height, double *vals){
-    unsigned char *image = create_bitmap(width * height, vals);
+char *save_bitmap(char *filename, double *vals, int width, int height){
+    unsigned char *image = create_bitmap(vals, width * height);
     FILE *f = fopen(filename, "wb");
     generateBitmapImage(image, height, width, f);
     fclose(f);
