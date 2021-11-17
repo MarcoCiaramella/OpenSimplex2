@@ -3,8 +3,8 @@
 
 
 
-#define WIDTH 4096
-#define HEIGHT 4096
+#define WIDTH 8
+#define HEIGHT 8
 #define SIZE WIDTH*HEIGHT
 
 
