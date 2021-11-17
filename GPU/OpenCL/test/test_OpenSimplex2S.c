@@ -7,6 +7,10 @@
 #define HEIGHT 64
 #define DEPTH 64
 #define TIME 64
+#define OFF_X 2048
+#define OFF_Y 2048
+#define PERIOD 64.0
+#define FREQ 1.0 / PERIOD
 
 
 double* new_grid2D(size_t* size){
