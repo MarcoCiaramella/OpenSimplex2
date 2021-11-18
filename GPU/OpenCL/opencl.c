@@ -273,8 +273,8 @@ size_t get_global_work_size(size_t local_work_size, size_t size){
 	return ceil(size / (cl_double)local_work_size) * local_work_size;
 }
 
-size_t num_points(size_t size, unsigned int dimensions){
-	return size/dimensions;
+size_t num_points(size_t size, unsigned int num_dimensions){
+	return size/num_dimensions;
 }
 
 double *run_kernel(
@@ -288,7 +288,7 @@ double *run_kernel(
 	size_t size2,
 	size_t size3,
 	size_t size_input_buffer,
-	unsigned int dimensions){
+	unsigned int num_dimensions){
 
 	cl_mem device_par1_buffer;
 	cl_mem device_par2_buffer;
@@ -307,9 +307,9 @@ double *run_kernel(
 
 	kernel = clCreateKernel(openCLEnv->program, function, &errcode_ret);
 	size_t local_work_size = get_local_work_size(kernel, openCLEnv->device);
-	size_t global_work_size = get_global_work_size(local_work_size, num_points(num_elements, dimensions));
+	size_t global_work_size = get_global_work_size(local_work_size, num_points(num_elements, num_dimensions));
 
-	output_size = num_points(num_elements, dimensions) * sizeof(double);
+	output_size = num_points(num_elements, num_dimensions) * sizeof(double);
 	output_buffer = (double *)malloc(output_size);
 
 	device_par1_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size1, host_ptr1, NULL);

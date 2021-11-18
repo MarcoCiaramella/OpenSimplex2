@@ -35,28 +35,28 @@ typedef struct {
 
 
 
-int get_index(const unsigned int size, const unsigned int dimensions){
+int get_index(const unsigned int size, const unsigned int num_dimensions){
 	int index = get_global_id(0);
-	if (index*dimensions + dimensions < size){
+	if (index*num_dimensions + num_dimensions < size){
 		return index;
 	}
 	return -1;
 }
 
-double get_x(double* buffer, int index, const unsigned int dimensions){
-	return buffer[index*dimensions];
+double get_x(double* buffer, int index, const unsigned int num_dimensions){
+	return buffer[index*num_dimensions];
 }
 
-double get_y(double* buffer, int index, const unsigned int dimensions){
-	return buffer[index*dimensions + 1];
+double get_y(double* buffer, int index, const unsigned int num_dimensions){
+	return buffer[index*num_dimensions + 1];
 }
 
-double get_z(double* buffer, int index, const unsigned int dimensions){
-	return buffer[index*dimensions + 2];
+double get_z(double* buffer, int index, const unsigned int num_dimensions){
+	return buffer[index*num_dimensions + 2];
 }
 
-double get_w(double* buffer, int index, const unsigned int dimensions){
-	return buffer[index*dimensions + 3];
+double get_w(double* buffer, int index, const unsigned int num_dimensions){
+	return buffer[index*num_dimensions + 3];
 }
 
 int fast_floor(double x){

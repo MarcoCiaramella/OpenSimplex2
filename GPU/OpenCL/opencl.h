@@ -25,4 +25,4 @@ double *run_kernel(
 	size_t size2,
 	size_t size3,
 	size_t size_input_buffer,
-	unsigned int dimensions);
+	unsigned int num_dimensions);
