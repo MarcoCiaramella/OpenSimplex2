@@ -1,4 +1,5 @@
 #define PMASK 2047
+#define INVALID_INDEX -1
 
 
 
@@ -35,33 +36,58 @@ typedef struct {
 
 
 
-int get_index(const unsigned int size, const unsigned int num_dimensions){
-	int index = get_global_id(0);
-	if (index*num_dimensions + num_dimensions < size){
-		return index;
-	}
-	return -1;
+int get_point_index_1D(){
+	return get_global_id(0);
 }
 
-double get_x(double* buffer, int index, const unsigned int num_dimensions){
+int get_point_index_2D(float width){
+	return get_global_id(1)*width + get_global_id(0);
+}
+
+int get_point_index_3D(float width, float height){
+	return get_global_id(2)*width*height + get_global_id(1)*width + get_global_id(0);
+}
+
+int get_point_index(const uint num_points){
+	int index = INVALID_INDEX;
+	if (get_work_dim() == 1){
+		index = get_point_index_1D();
+	}
+	else if (get_work_dim() == 2){
+		index = get_point_index_2D(ceil(sqrt((float)num_points)));
+	}
+	else if (get_work_dim() == 3){
+		index = get_point_index_3D(ceil(sqrt((float)num_points)), ceil(sqrt((float)num_points)));
+	}
+	if (index < num_points){
+		return index;
+	}
+	return INVALID_INDEX;
+}
+
+double get_x(double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions];
 }
 
-double get_y(double* buffer, int index, const unsigned int num_dimensions){
+double get_y(double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 1];
 }
 
-double get_z(double* buffer, int index, const unsigned int num_dimensions){
+double get_z(double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 2];
 }
 
-double get_w(double* buffer, int index, const unsigned int num_dimensions){
+double get_w(double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 3];
 }
 
 int fast_floor(double x){
 	int xi = (int)x;
 	return x < xi ? xi - 1 : xi;
+}
+
+int is_a_valid_index(int index){
+	return index != INVALID_INDEX;
 }
 
 double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double xs, double ys){
@@ -111,11 +137,11 @@ __kernel void noise2(
     __global Grad2* permGrad2,
     __global LatticePoint2D* LOOKUP_2D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 2);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 
 		double x = get_x(input, index, 2);
 		double y = get_y(input, index, 2);
@@ -134,11 +160,11 @@ __kernel void noise2_XBeforeY(
     __global Grad2* permGrad2,
     __global LatticePoint2D* LOOKUP_2D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 2);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 
 		double x = get_x(input, index, 2);
 		double y = get_y(input, index, 2);
@@ -199,11 +225,11 @@ __kernel void noise3_Classic(
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 3);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 3);
 		double y = get_y(input, index, 3);
@@ -227,11 +253,11 @@ __kernel void noise3_XYBeforeZ(
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 3);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 3);
 		double y = get_y(input, index, 3);
@@ -256,11 +282,11 @@ __kernel void noise3_XZBeforeY(
     __global Grad3* permGrad3,
     __global LatticePoint3D* LOOKUP_3D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 3);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 3);
 		double y = get_y(input, index, 3);
@@ -281,7 +307,7 @@ __kernel void noise3_XZBeforeY(
 }
 
 double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global LatticePoint4D* LOOKUP_4D, double xs, double ys, double zs, double ws){
-	const unsigned int sizes[256] = {
+	const uint sizes[256] = {
 		20, 15, 16, 17, 15, 16, 12, 15, 16, 12, 10, 14, 17, 15, 14,
 		17, 15, 16, 12, 15, 16, 14, 14, 13, 12, 14, 11, 12, 15, 13,
 		12, 14, 16, 12, 10, 14, 12, 14, 11, 12, 10, 11, 10, 13, 14,
@@ -300,7 +326,7 @@ double _noise4_Base(__global short* perm, __global Grad4* permGrad4, __global La
 		12, 13, 15, 12, 11, 14, 13, 13, 14, 14, 16, 15, 13, 16, 15,
 		17, 14, 15, 17, 14, 10, 13, 13, 15, 13, 16, 15, 17, 13, 15, 20};
 
-	const unsigned int offsets[256] = {0, 20, 35, 51, 68, 83, 99, 111, 126, 142, 154, 164, 178,
+	const uint offsets[256] = {0, 20, 35, 51, 68, 83, 99, 111, 126, 142, 154, 164, 178,
 	195, 210, 224, 241, 256, 272, 284, 299, 315, 329, 343, 356, 368,
 	382, 393, 405, 420, 433, 445, 459, 475, 487, 497, 511, 523, 537,
 	548, 560, 570, 581, 591, 604, 618, 630, 643, 658, 675, 690, 704,
@@ -375,11 +401,11 @@ __kernel void noise4_Classic(
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 4);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 4);
 		double y = get_y(input, index, 4);
@@ -402,11 +428,11 @@ __kernel void noise4_XYBeforeZW(
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 4);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 4);
 		double y = get_y(input, index, 4);
@@ -429,11 +455,11 @@ __kernel void noise4_XZBeforeYW(
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 4);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 4);
 		double y = get_y(input, index, 4);
@@ -456,11 +482,11 @@ __kernel void noise4_XYZBeforeW(
     __global Grad4* permGrad4,
     __global LatticePoint4D* LOOKUP_4D,
 	__global double* input,
-	const unsigned int size,
+	const uint num_points,
 	__global double* output){
 
-	int index = get_index(size, 4);
-    if (index >= 0){
+	int index = get_point_index(num_points);
+    if (is_a_valid_index(index)){
 		
 		double x = get_x(input, index, 4);
 		double y = get_y(input, index, 4);
