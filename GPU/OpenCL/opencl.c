@@ -273,6 +273,49 @@ size_t get_global_work_size(size_t local_work_size, size_t size){
 	return ceil(size / (cl_double)local_work_size) * local_work_size;
 }
 
+
+
+
+
+
+size_t *get_local_work_size_2D(cl_kernel kernel, cl_device_id device){
+	size_t *max_num_work_item = get_max_num_work_item(device, get_num_dimensions(device));
+	size_t work_group_size = get_work_group_size(kernel, device);
+	size_t *local_work_size = (size_t *)malloc(sizeof(size_t) * 2);
+	local_work_size[0] = MIN(floor(sqrt(work_group_size)), max_num_work_item[0]);
+	local_work_size[1] = MIN(floor(sqrt(work_group_size)), max_num_work_item[1]);
+	return local_work_size;
+}
+
+size_t *get_global_work_size_2D(size_t *local_work_size, int width, int height){
+	size_t *global_work_size = (size_t *)malloc(sizeof(size_t) * 2);
+	global_work_size[0] = ceil(width / (cl_double)local_work_size[0]) * local_work_size[0];
+	global_work_size[1] = ceil(height / (cl_double)local_work_size[1]) * local_work_size[1];
+	return global_work_size;
+}
+
+size_t *get_local_work_size_3D(cl_kernel kernel, cl_device_id device){
+	size_t *max_num_work_item = get_max_num_work_item(device, get_num_dimensions(device));
+	size_t work_group_size = get_work_group_size(kernel, device);
+	size_t *local_work_size = (size_t *)malloc(sizeof(size_t) * 3);
+	local_work_size[0] = MIN(floor(cbrt(work_group_size)), max_num_work_item[0]);
+	local_work_size[1] = MIN(floor(cbrt(work_group_size)), max_num_work_item[1]);
+	local_work_size[2] = MIN(floor(cbrt(work_group_size)), max_num_work_item[2]);
+	return local_work_size;
+}
+
+size_t *get_global_work_size_3D(size_t *local_work_size, int width, int height){
+	size_t *global_work_size = (size_t *)malloc(sizeof(size_t) * 3);
+	global_work_size[0] = ceil(width / (cl_double)local_work_size[0]) * local_work_size[0];
+	global_work_size[1] = ceil(height / (cl_double)local_work_size[1]) * local_work_size[1];
+	global_work_size[2] = ceil(height / (cl_double)local_work_size[2]) * local_work_size[2];
+	return global_work_size;
+}
+
+
+
+
+
 double *run_kernel(
 	OpenCLEnv* openCLEnv,
 	char *function,
