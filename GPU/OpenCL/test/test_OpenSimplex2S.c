@@ -3,10 +3,9 @@
 
 
 
-#define WIDTH 64
-#define HEIGHT 64
-#define DEPTH 64
-#define TIME 64
+#define SIZE_2D 4096
+#define SIZE_3D 256
+#define SIZE_4D 64
 #define OFF_X 2048
 #define OFF_Y 2048
 #define OFF_Z 2048
@@ -16,12 +15,12 @@
 
 
 double* new_grid2D(size_t* size){
-     size_t num_points = WIDTH*HEIGHT;
+     size_t num_points = SIZE_2D*SIZE_2D;
      *size = num_points * 2 * sizeof(double);
      double* grid = (double*) malloc(*size);
      int i = 0;
-     for (int y = 0; y < HEIGHT; y++){
-          for (int x = 0; x < WIDTH; x++){
+     for (int y = 0; y < SIZE_2D; y++){
+          for (int x = 0; x < SIZE_2D; x++){
                grid[i++] = (x + OFF_X) * FREQ;
                grid[i++] = (y + OFF_Y) * FREQ;
           }
@@ -30,13 +29,13 @@ double* new_grid2D(size_t* size){
 }
 
 double* new_grid3D(size_t* size){
-     size_t num_points = WIDTH*HEIGHT*DEPTH;
+     size_t num_points = SIZE_3D*SIZE_3D*SIZE_3D;
      *size = num_points * 3 * sizeof(double);
      double* grid = (double*) malloc(*size);
      int i = 0;
-     for (int z = 0; z < DEPTH; z++){
-          for (int y = 0; y < HEIGHT; y++){
-               for (int x = 0; x < WIDTH; x++){
+     for (int z = 0; z < SIZE_3D; z++){
+          for (int y = 0; y < SIZE_3D; y++){
+               for (int x = 0; x < SIZE_3D; x++){
                     grid[i++] = (x + OFF_X) * FREQ;
                     grid[i++] = (y + OFF_Y) * FREQ;
                     grid[i++] = (z + OFF_Z) * FREQ;
@@ -46,14 +45,14 @@ double* new_grid3D(size_t* size){
      return grid;
 }
 double* new_grid4D(size_t* size){
-     size_t num_points = WIDTH*HEIGHT*DEPTH*TIME;
+     size_t num_points = SIZE_4D*SIZE_4D*SIZE_4D*SIZE_4D;
      *size = num_points * 4 * sizeof(double);
      double* grid = (double*) malloc(*size);
      int i = 0;
-     for (int w = 0; w < TIME; w++){
-          for (int z = 0; z < DEPTH; z++){
-               for (int y = 0; y < HEIGHT; y++){
-                    for (int x = 0; x < WIDTH; x++){
+     for (int w = 0; w < SIZE_4D; w++){
+          for (int z = 0; z < SIZE_4D; z++){
+               for (int y = 0; y < SIZE_4D; y++){
+                    for (int x = 0; x < SIZE_4D; x++){
                          grid[i++] = (x + OFF_X) * FREQ;
                          grid[i++] = (y + OFF_Y) * FREQ;
                          grid[i++] = (z + OFF_Z) * FREQ;
@@ -77,27 +76,27 @@ int main(){
 
      grid = new_grid2D(&size_input_buffer);
      output_buffer = noise2(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise2.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise2.bmp", output_buffer, SIZE_2D, SIZE_2D);
      output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise2_XBeforeY.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise2_XBeforeY.bmp", output_buffer, SIZE_2D, SIZE_2D);
 
      grid = new_grid3D(&size_input_buffer);
      output_buffer = noise3_Classic(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise3_Classic.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise3_Classic.bmp", output_buffer, SIZE_3D, SIZE_3D);
      output_buffer = noise3_XYBeforeZ(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise3_XYBeforeZ.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise3_XYBeforeZ.bmp", output_buffer, SIZE_3D, SIZE_3D);
      output_buffer = noise3_XZBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise3_XZBeforeY.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise3_XZBeforeY.bmp", output_buffer, SIZE_3D, SIZE_3D);
 
      grid = new_grid4D(&size_input_buffer);
      output_buffer = noise4_Classic(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise4_Classic.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise4_Classic.bmp", output_buffer, SIZE_4D, SIZE_4D);
      output_buffer = noise4_XYBeforeZW(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise4_XYBeforeZW.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise4_XYBeforeZW.bmp", output_buffer, SIZE_4D, SIZE_4D);
      output_buffer = noise4_XZBeforeYW(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise4_XZBeforeYW.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise4_XZBeforeYW.bmp", output_buffer, SIZE_4D, SIZE_4D);
      output_buffer = noise4_XYZBeforeW(&openCLEnv, ose, osg, grid, size_input_buffer);
-     save_bitmap("OpenSimplex2S_noise4_XYZBeforeW.bmp", output_buffer, WIDTH, HEIGHT);
+     save_bitmap("OpenSimplex2S_noise4_XYZBeforeW.bmp", output_buffer, SIZE_4D, SIZE_4D);
 
      releaseOpenCL(&openCLEnv);
      return 0;
