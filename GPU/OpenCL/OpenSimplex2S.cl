@@ -57,7 +57,7 @@ int get_point_index(const uint num_points){
 		index = get_point_index_2D(ceil(sqrt((float)num_points)));
 	}
 	else if (get_work_dim() == 3){
-		index = get_point_index_3D(ceil(sqrt((float)num_points)), ceil(sqrt((float)num_points)));
+		index = get_point_index_3D(ceil(cbrt((float)num_points)), ceil(cbrt((float)num_points)));
 	}
 	if (index < num_points){
 		return index;
