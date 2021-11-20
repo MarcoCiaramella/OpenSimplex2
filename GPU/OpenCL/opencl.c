@@ -10,6 +10,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
+#define WORK_DIM 2
 
 
 
@@ -271,9 +272,9 @@ size_t* get_local_work_size_1D(cl_kernel kernel, cl_device_id device){
 	return local_work_size;
 }
 
-size_t* get_global_work_size_1D(size_t* local_work_size, size_t size){
+size_t* get_global_work_size_1D(size_t* local_work_size, size_t num_points){
 	size_t *global_work_size = (size_t *)malloc(sizeof(size_t));
-	global_work_size[0] = ceil(size / (cl_double)local_work_size[0]) * local_work_size[0];
+	global_work_size[0] = ceil(num_points / (cl_double)local_work_size[0]) * local_work_size[0];
 	return global_work_size;
 }
 
@@ -286,10 +287,10 @@ size_t* get_local_work_size_2D(cl_kernel kernel, cl_device_id device){
 	return local_work_size;
 }
 
-size_t* get_global_work_size_2D(size_t* local_work_size, int width, int height){
+size_t* get_global_work_size_2D(size_t* local_work_size, size_t num_points){
 	size_t *global_work_size = (size_t *)malloc(sizeof(size_t) * 2);
-	global_work_size[0] = ceil(width / (cl_double)local_work_size[0]) * local_work_size[0];
-	global_work_size[1] = ceil(height / (cl_double)local_work_size[1]) * local_work_size[1];
+	global_work_size[0] = ceil(sqrt(num_points) / (cl_double)local_work_size[0]) * local_work_size[0];
+	global_work_size[1] = ceil(sqrt(num_points) / (cl_double)local_work_size[1]) * local_work_size[1];
 	return global_work_size;
 }
 
@@ -303,17 +304,13 @@ size_t* get_local_work_size_3D(cl_kernel kernel, cl_device_id device){
 	return local_work_size;
 }
 
-size_t* get_global_work_size_3D(size_t* local_work_size, int width, int height, int depth){
+size_t* get_global_work_size_3D(size_t* local_work_size, size_t num_points){
 	size_t *global_work_size = (size_t *)malloc(sizeof(size_t) * 3);
-	global_work_size[0] = ceil(width / (cl_double)local_work_size[0]) * local_work_size[0];
-	global_work_size[1] = ceil(height / (cl_double)local_work_size[1]) * local_work_size[1];
-	global_work_size[2] = ceil(depth / (cl_double)local_work_size[2]) * local_work_size[2];
+	global_work_size[0] = ceil(cbrt(num_points) / (cl_double)local_work_size[0]) * local_work_size[0];
+	global_work_size[1] = ceil(cbrt(num_points) / (cl_double)local_work_size[1]) * local_work_size[1];
+	global_work_size[2] = ceil(cbrt(num_points) / (cl_double)local_work_size[2]) * local_work_size[2];
 	return global_work_size;
 }
-
-
-
-
 
 double *run_kernel(
 	OpenCLEnv* openCLEnv,
@@ -340,12 +337,24 @@ double *run_kernel(
 	cl_int errcode_ret;
 	cl_kernel kernel;
 	unsigned int num_points = size_input_buffer / sizeof(double) / num_dimensions;
+	size_t* local_work_size;
+	size_t* global_work_size;
 
 	ftime(&start);
 
 	kernel = clCreateKernel(openCLEnv->program, function, &errcode_ret);
-	size_t* local_work_size = get_local_work_size_1D(kernel, openCLEnv->device);
-	size_t* global_work_size = get_global_work_size_1D(local_work_size, num_points);
+	if (WORK_DIM == 1){
+		local_work_size = get_local_work_size_1D(kernel, openCLEnv->device);
+		global_work_size = get_global_work_size_1D(local_work_size, num_points);
+	}
+	else if (WORK_DIM == 2){
+		local_work_size = get_local_work_size_2D(kernel, openCLEnv->device);
+		global_work_size = get_global_work_size_2D(local_work_size, num_points);
+	}
+	else {
+		local_work_size = get_local_work_size_3D(kernel, openCLEnv->device);
+		global_work_size = get_global_work_size_3D(local_work_size, num_points);
+	}
 
 	output_size = num_points * sizeof(double);
 	output_buffer = (double *)malloc(output_size);
@@ -368,7 +377,7 @@ double *run_kernel(
 	clSetKernelArg(kernel, 4, sizeof(unsigned int), &num_points);
 	clSetKernelArg(kernel, 5, sizeof(cl_mem), &device_output_buffer);
 
-	res = clEnqueueNDRangeKernel(openCLEnv->queue, kernel, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
+	res = clEnqueueNDRangeKernel(openCLEnv->queue, kernel, WORK_DIM, NULL, global_work_size, local_work_size, 0, NULL, NULL);
 	print_error(res);
 	clFinish(openCLEnv->queue);
 
