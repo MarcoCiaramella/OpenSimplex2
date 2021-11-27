@@ -359,13 +359,13 @@ double *run_kernel(
 	output_size = num_points * sizeof(double);
 	output_buffer = (double *)malloc(output_size);
 
-	device_par1_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size1, host_ptr1, NULL);
+	device_par1_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size1, host_ptr1, NULL);
 	//device_OpenSimplexEnv_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexEnv), NULL, NULL);
 	//clEnqueueWriteBuffer(queue, device_OpenSimplexEnv_buffer, CL_TRUE, 0, sizeof(OpenSimplexEnv), &ose, 0, NULL, NULL);
-	device_par2_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size2, host_ptr2, NULL);
+	device_par2_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size2, host_ptr2, NULL);
 	//device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexGradients), NULL, NULL);
 	//clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, sizeof(OpenSimplexGradients), &osg, 0, NULL, NULL);
-	device_par3_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size3, host_ptr3, NULL);
+	device_par3_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size3, host_ptr3, NULL);
 	device_input_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size_input_buffer, input_buffer, NULL);
 	device_output_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
 	//device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, output_size, output_buffer, NULL);

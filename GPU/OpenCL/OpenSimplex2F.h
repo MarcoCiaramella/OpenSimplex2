@@ -2,16 +2,10 @@
 
 
 #define PSIZE 2048
-#define PMASK 2047
 #define N2 0.01001634121365712
 #define N3 0.030485933181293584
 #define N4 0.009202377986303158
 
-
-#define PERIOD 64.0
-#define OFF_X 2048
-#define OFF_Y 2048	
-#define FREQ 1.0 / PERIOD
 
 
 
