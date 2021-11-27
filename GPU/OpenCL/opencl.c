@@ -10,7 +10,7 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-#define WORK_DIM 2
+#define WORK_DIM 3
 
 
 
@@ -366,7 +366,7 @@ double *run_kernel(
 	//device_OpenSimplexGradients_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(OpenSimplexGradients), NULL, NULL);
 	//clEnqueueWriteBuffer(queue, device_OpenSimplexGradients_buffer, CL_TRUE, 0, sizeof(OpenSimplexGradients), &osg, 0, NULL, NULL);
 	device_par3_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size3, host_ptr3, NULL);
-	device_input_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, size_input_buffer, input_buffer, NULL);
+	device_input_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, size_input_buffer, input_buffer, NULL);
 	device_output_buffer = clCreateBuffer(openCLEnv->context, CL_MEM_WRITE_ONLY, output_size, NULL, NULL);
 	//device_output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY | CL_MEM_USE_HOST_PTR, output_size, output_buffer, NULL);
 
