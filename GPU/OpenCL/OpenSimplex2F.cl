@@ -65,19 +65,19 @@ int get_point_index(const uint num_points){
 	return INVALID_INDEX;
 }
 
-double get_x(double* buffer, int index, const uint num_dimensions){
+double get_x(__global double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions];
 }
 
-double get_y(double* buffer, int index, const uint num_dimensions){
+double get_y(__global double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 1];
 }
 
-double get_z(double* buffer, int index, const uint num_dimensions){
+double get_z(__global double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 2];
 }
 
-double get_w(double* buffer, int index, const uint num_dimensions){
+double get_w(__global double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 3];
 }
 
