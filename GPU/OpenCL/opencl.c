@@ -401,7 +401,7 @@ double *run_kernel(
 	return output_buffer;
 }
 
-OpenCLEnv loadOpenCL(char *kernel_filename){
+OpenCLEnv loadOpenCL(char *program_filename){
 
 	OpenCLEnv openCLEnv;
 	cl_context context;
@@ -409,7 +409,7 @@ OpenCLEnv loadOpenCL(char *kernel_filename){
 	cl_program program;
 	cl_int errcode_ret;
 	cl_uint num_compute_units;
-	const char *kernel_source;
+	const char *program_source;
 	cl_int res;
 	struct timeb start, end;
 	cl_platform_id gpu_platform;
@@ -421,11 +421,11 @@ OpenCLEnv loadOpenCL(char *kernel_filename){
 	get_GPU_device(gpu_platform, &device);
 
 	num_compute_units = get_num_compute_units(device);
-	kernel_source = read_file(kernel_filename);
+	program_source = read_file(program_filename);
 
 	context = clCreateContext(0, 1, &device, NULL, NULL, &errcode_ret);
 	queue = clCreateCommandQueue(context, device, 0, &errcode_ret);
-	program = clCreateProgramWithSource(context, 1, &kernel_source, NULL, &errcode_ret);
+	program = clCreateProgramWithSource(context, 1, &program_source, NULL, &errcode_ret);
 	res = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
 	print_build_log_failure(res, device, program);
 

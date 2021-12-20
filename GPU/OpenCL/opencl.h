@@ -12,7 +12,7 @@ typedef struct {
     cl_command_queue queue;
 } OpenCLEnv;
 
-OpenCLEnv loadOpenCL(char *kernel_filename);
+OpenCLEnv loadOpenCL(char *program_filename);
 void releaseOpenCL(OpenCLEnv* openCLEnv);
 double *run_kernel(
 	OpenCLEnv* openCLEnv,
