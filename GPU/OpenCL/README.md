@@ -5,6 +5,7 @@ C implementation for GPU using OpenCL
 All functions accept an input array of 2D, 3D and 4D points.
 For example for noise2 you have to allocate and load an array of N points in the form of `[x1,y1,x2,y2,...,xn,yn]`.
 With noise3 the input array must be in the form of `[x1,y1,z1,x2,y2,z2,...,xn,yn,zn]` and with noise4 `[x1,y1,z1,w1,x2,y2,z2,w2,...,xn,yn,zn,wn]`.
+The ouput array stores the noise generated for each point.
 
 ## How to use
 Make sure you have an OpenCL driver installed.

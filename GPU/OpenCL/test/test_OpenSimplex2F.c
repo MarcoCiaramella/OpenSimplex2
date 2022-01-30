@@ -75,22 +75,28 @@ int main(){
      double* grid;
      size_t size_input_buffer;
 
+     // for 2D shapes like heightmaps
      grid = new_grid2D(&size_input_buffer);
      output_buffer = noise2(&openCLEnv, ose, osg, grid, size_input_buffer);
+     // save a bitmap for debug purposes
      save_bitmap("OpenSimplex2F_noise2.bmp", output_buffer, SIZE_2D, SIZE_2D);
      output_buffer = noise2_XBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2F_noise2_XBeforeY.bmp", output_buffer, SIZE_2D, SIZE_2D);
 
+     // for 3D shapes like 3D meshes
      grid = new_grid3D(&size_input_buffer);
      output_buffer = noise3_Classic(&openCLEnv, ose, osg, grid, size_input_buffer);
+     // save a 2D section as bitmap for debug purposes
      save_bitmap("OpenSimplex2F_noise3_Classic.bmp", output_buffer, SIZE_3D, SIZE_3D);
      output_buffer = noise3_XYBeforeZ(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2F_noise3_XYBeforeZ.bmp", output_buffer, SIZE_3D, SIZE_3D);
      output_buffer = noise3_XZBeforeY(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2F_noise3_XZBeforeY.bmp", output_buffer, SIZE_3D, SIZE_3D);
 
+     // for 4D shapes
      grid = new_grid4D(&size_input_buffer);
      output_buffer = noise4_Classic(&openCLEnv, ose, osg, grid, size_input_buffer);
+     // save a 2D section as bitmap for debug purposes
      save_bitmap("OpenSimplex2F_noise4_Classic.bmp", output_buffer, SIZE_4D, SIZE_4D);
      output_buffer = noise4_XYBeforeZW(&openCLEnv, ose, osg, grid, size_input_buffer);
      save_bitmap("OpenSimplex2F_noise4_XYBeforeZW.bmp", output_buffer, SIZE_4D, SIZE_4D);
