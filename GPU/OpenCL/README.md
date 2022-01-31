@@ -15,7 +15,7 @@ You can find an [example](test/test_OpenSimplex2F.c) under test directory.
 You can find an [example](test/test_OpenSimplex2S.c) under test directory.
 
 ## How to compile
-Download the official OpenCL headers [repository](https://github.com/KhronosGroup/OpenCL-Headers)
+Download the official OpenCL [headers](https://github.com/KhronosGroup/OpenCL-Headers) or use the [copy](CL) in this repository.
 ### gcc
 Compiling OpenSimplex2F example:
 ```shell
