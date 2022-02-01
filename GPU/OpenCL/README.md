@@ -8,7 +8,7 @@ With noise3 the input array must be in the form of `[x1,y1,z1,x2,y2,z2,...,xn,yn
 The ouput array stores the noise generated for each point.
 
 ## How to use
-Make sure you have an OpenCL driver installed.
+Make sure you have an OpenCL 3.0 driver installed.
 ### OpenSimplex2F
 You can find an [example](test/test_OpenSimplex2F.c) under test directory.
 ### OpenSimplex2S
