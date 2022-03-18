@@ -81,6 +81,10 @@ double get_w(__global double* buffer, int index, const uint num_dimensions){
 	return buffer[index*num_dimensions + 3];
 }
 
+double2 get_xy(__global double* buffer, int index, const uint num_dimensions){
+	return (double2) (get_x(buffer, index, num_dimensions), get_y(buffer, index, num_dimensions));
+}
+
 int fast_floor(double x){
 	int xi = (int)x;
 	return x < xi ? xi - 1 : xi;
@@ -90,31 +94,30 @@ int is_a_valid_index(int index){
 	return index != INVALID_INDEX;
 }
 
-double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double xs, double ys){
+double _noise2_Base(__global short* perm, __global Grad2* permGrad2, __global LatticePoint2D* LOOKUP_2D, double2 s){
 	double value = 0;
 
 	// Get base points and offsets
-	int xsb = fast_floor(xs), ysb = fast_floor(ys);
-	double xsi = xs - xsb, ysi = ys - ysb;
+	int2 sb = (int2) (fast_floor(s.x), fast_floor(s.y));  // can be optimized
+	double2 si = s - convert_double2(sb);
 
 	// Index to point list
-	int index = (int)((ysi - xsi) / 2 + 1);
-
-	double ssi = (xsi + ysi) * -0.211324865405187;
-	double xi = xsi + ssi, yi = ysi + ssi;
+	int index = (int)((si.y - si.x) / 2 + 1);
+	
+	double2 i = si + (si.x + si.y) * -0.211324865405187;
 
 	// Point contributions
-	for (int i = 0; i < 3; i++){
-		__global LatticePoint2D *c = &(LOOKUP_2D[index + i]);
-
-		double dx = xi + c->dx, dy = yi + c->dy;
-		double attn = 0.5 - dx * dx - dy * dy;
+	for (int j = 0; j < 3; j++){
+		__global LatticePoint2D *c = &(LOOKUP_2D[index + j]);
+		double2 d = i + (double2) (c->dx, c->dy);
+		double attn = 0.5 - d.x * d.x - d.y * d.y;
 		if (attn <= 0)
 			continue;
 
-		int pxm = (xsb + c->xsv) & PMASK, pym = (ysb + c->ysv) & PMASK;
-		Grad2 grad = permGrad2[perm[pxm] ^ pym];
-		double extrapolation = grad.dx * dx + grad.dy * dy;
+		int2 pm = (sb + (int2) (c->xsv, c->ysv)) & PMASK;
+
+		Grad2 grad = permGrad2[perm[pm.x] ^ pm.y];
+		double extrapolation = grad.dx * d.x + grad.dy * d.y;
 
 		attn *= attn;
 		value += attn * attn * extrapolation;
@@ -134,14 +137,12 @@ __kernel void noise2(
 	int index = get_point_index(num_points);
     if (is_a_valid_index(index)){
 
-		double x = get_x(input, index, 2);
-		double y = get_y(input, index, 2);
+		double2 xy = get_xy(input, index, 2);
 
 		// Get points for A2* lattice
-		double s = 0.366025403784439 * (x + y);
-		double xs = x + s, ys = y + s;
+		double2 s = xy + 0.366025403784439 * (xy.x + xy.y);
 
-		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, xs, ys);
+		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, s);
 	}
 }
 
@@ -156,14 +157,14 @@ __kernel void noise2_XBeforeY(
 	int index = get_point_index(num_points);
     if (is_a_valid_index(index)){
 
-		double x = get_x(input, index, 2);
-		double y = get_y(input, index, 2);
+		double2 xy = get_xy(input, index, 2);
 
 		// Skew transform and rotation baked into one.
-		double xx = x * 0.7071067811865476;
-		double yy = y * 1.224744871380249;
+		double2 s = xy * (double2) (0.7071067811865476, 1.224744871380249);
+		s.x = s.y + s.x;
+		s.y = s.y - s.x;
 
-		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, yy + xx, yy - xx);
+		output[index] = _noise2_Base(perm, permGrad2, LOOKUP_2D, s);
 	}
 }
 
