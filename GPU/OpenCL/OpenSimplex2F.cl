@@ -146,6 +146,7 @@ __kernel void noise2(
 	}
 }
 
+// TODO: wrong output
 __kernel void noise2_XBeforeY(
 	__global short* perm,
     __global Grad2* permGrad2,
